@@ -10,6 +10,7 @@ use App\Http\Controllers\BannerController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\SocialAuthController;
+use App\Http\Controllers\DiscountController;
 
 Route::get('/test', function () {return view('test.test');});
 
@@ -92,4 +93,12 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('admin/banners/{banner}/edit', [BannerController::class, 'edit'])->name('banners.edit');
     Route::put('admin/banners/{banner}', [BannerController::class, 'update'])->name('banners.update');
     Route::delete('admin/banners/{banner}', [BannerController::class, 'destroy'])->name('banners.destroy');
+
+    // Discount Routes
+    Route::get('admin/discounts', [DiscountController::class, 'index'])->name('discounts.index');
+    Route::get('admin/discounts/create', [DiscountController::class, 'create'])->name('discounts.create');
+    Route::post('admin/discounts', [DiscountController::class, 'store'])->name('discounts.store');
+    Route::get('admin/discounts/{discount}/edit', [DiscountController::class, 'edit'])->name('discounts.edit');
+    Route::put('admin/discounts/{discount}', [DiscountController::class, 'update'])->name('discounts.update');
+    route::delete('admin/discounts/{discount}', [DiscountController::class, 'destroy'])->name('discounts.destroy');
 });

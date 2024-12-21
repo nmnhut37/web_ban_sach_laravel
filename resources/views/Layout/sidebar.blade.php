@@ -55,7 +55,7 @@
                 <div id="collapsetree" class="collapse" aria-labelledby="headingtree" data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
                         <a class="collapse-item" href="{{route('banners.index')}}">Banner</a>
-                        <a class="collapse-item" href="quanlybinhluan.php">Mã giảm giá</a>
+                        <a class="collapse-item" href="{{route('discounts.index')}}">Mã giảm giá</a>
                     </div>
                 </div>
             </li>
