@@ -5,7 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\Category;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
+use App\Models\Banner;
 
 class ProductController extends Controller
 {
@@ -34,6 +35,7 @@ class ProductController extends Controller
             'stock_quantity' => 'required|integer',
             'category_id' => 'required|exists:categories,id',
         ]);
+
         // Xử lý upload hình ảnh
         $imageName = null;
         if ($request->hasFile('img')) {
@@ -41,11 +43,11 @@ class ProductController extends Controller
             if ($imageFile->isValid()) {
                 $imageName = time() . '-' . $imageFile->getClientOriginalName();
                 $imageFile->move(public_path('storage/images/product'), $imageName);
+            } else {
+                return redirect()->back()->with('error', 'Không thể tải lên hình ảnh. Vui lòng thử lại.');
             }
         }
-        if (!$imageName) {
-            return redirect()->back()->with('error', 'Không thể tải lên hình ảnh. Vui lòng thử lại.');
-        }
+
         Product::create([
             'product_name' => $request->product_name,
             'description' => $request->description,
@@ -54,9 +56,10 @@ class ProductController extends Controller
             'stock_quantity' => $request->stock_quantity,
             'category_id' => $request->category_id,
         ]);
+
         return redirect()->route('product_list')->with('success', 'Sản phẩm đã được thêm thành công');
     }
-    
+
     // Hiển thị form sửa sản phẩm
     public function edit($id)
     {
@@ -64,7 +67,6 @@ class ProductController extends Controller
         $categories = Category::whereNotNull('parent_id')->get();
         return view('Admin.product_manage.product.product_edit', compact('product', 'categories'));
     }
-    
 
     // Cập nhật thông tin sản phẩm
     public function update(Request $request, $id)
@@ -77,19 +79,30 @@ class ProductController extends Controller
             'stock_quantity' => 'required|integer',
             'category_id' => 'required|exists:categories,id',
         ]);
+
         $product = Product::findOrFail($id);
+
         // Xử lý upload ảnh mới
+        $imageUpdated = false;
         if ($request->hasFile('img')) {
-            // Xóa ảnh cũ nếu tồn tại
-            if ($product->img && file_exists(public_path('storage/images/product/' . $product->img))) {
-                unlink(public_path('storage/images/product/' . $product->img));
-            }
-            // Lưu ảnh mới
             $imageFile = $request->file('img');
-            $imageName = time() . '-' . $imageFile->getClientOriginalName();
-            $imageFile->move(public_path('storage/images/product'), $imageName);
-            $product->img = $imageName;
+            if ($imageFile->isValid()) {
+                // Xóa ảnh cũ nếu tồn tại
+                if ($product->img && file_exists(public_path('storage/images/product/' . $product->img))) {
+                    unlink(public_path('storage/images/product/' . $product->img));
+                }
+
+                // Lưu ảnh mới
+                $imageName = time() . '-' . $imageFile->getClientOriginalName();
+                $imageFile->move(public_path('storage/images/product'), $imageName);
+                $product->img = $imageName;
+                $imageUpdated = true;
+            } else {
+                return redirect()->back()->with('error', 'Không thể tải lên hình ảnh. Vui lòng thử lại.');
+            }
         }
+
+        // Cập nhật thông tin sản phẩm
         $product->update([
             'product_name' => $request->product_name,
             'description' => $request->description,
@@ -97,9 +110,14 @@ class ProductController extends Controller
             'stock_quantity' => $request->stock_quantity,
             'category_id' => $request->category_id,
         ]);
-    
-        return redirect()->route('product_list')->with('success', 'Sản phẩm đã được cập nhật thành công');
+
+        if ($imageUpdated) {
+            return redirect()->route('product_list')->with('success', 'Sản phẩm và ảnh đã được cập nhật thành công');
+        }
+
+        return redirect()->route('product_list')->with('success', 'Thông tin sản phẩm đã được cập nhật thành công');
     }
+
     // Xóa sản phẩm
     public function destroy($id)
     {
@@ -112,5 +130,74 @@ class ProductController extends Controller
         }
         $product->delete();
         return redirect()->route('product_list')->with('success', 'Sản phẩm đã được xóa thành công');
-    }    
+    }
+    // Tìm kiếm sản phẩm admin
+    public function search(Request $request)
+    {
+        try {
+            $query = Product::query();
+
+            if ($request->has('search')) {
+                $search = $request->get('search');
+                $query->where('product_name', 'LIKE', "%{$search}%");
+            }
+
+            if ($request->has('category_id') && !empty($request->category_id)) {
+                $query->where('category_id', $request->category_id);
+            }
+
+            $products = $query->get();
+
+            if ($request->ajax()) {
+                return response()->json(['success' => true, 'products' => $products]);
+            }
+
+            return view('products.search', compact('products'));
+        } catch (\Exception $e) {
+            if ($request->ajax()) {
+                return response()->json(['success' => false, 'error' => 'Có lỗi xảy ra khi tìm kiếm sản phẩm'], 500);
+            }
+            return back()->with('error', 'Có lỗi xảy ra khi tìm kiếm sản phẩm');
+        }
+    }
+    public function searchshop(Request $request)
+    {
+        $searchTerm = $request->input('tensp');
+        $products = Product::where('product_name', 'like', '%' . $searchTerm . '%')->get();
+        $banners = Banner::orderBy('order')->get();
+        // Trả về kết quả tìm kiếm (có thể trả về view hoặc JSON tùy nhu cầu)
+        return view('shop.search', compact('products', 'banners'));
+    }
+
+    // Phương thức để lấy gợi ý sản phẩm
+    public function searchSuggestions(Request $request)
+    {
+        try {
+            $query = $request->get('query');
+            
+            $products = Product::where('product_name', 'like', "%{$query}%")
+                ->select('id', 'product_name', 'img', 'price')
+                ->take(5)
+                ->get()
+                ->map(function ($product) {
+                    return [
+                        'id' => $product->id,
+                        'product_name' => $product->product_name,
+                        'img' => $product->img,
+                        'price' => $product->price,
+                        'price_formatted' => number_format($product->price, 0, ',', '.') . ' đ'
+                    ];
+                })->toArray();
+
+            return response()->json($products, 200, [
+                'Content-Type' => 'application/json',
+            ]);
+            
+        } catch (\Exception $e) {
+            Log::error('Search suggestion error: ' . $e->getMessage());
+            return response()->json([], 200);
+        }
+    }
+
+
 }

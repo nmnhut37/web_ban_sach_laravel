@@ -8,7 +8,9 @@
             <div class="card-body p-0">
                 <div class="row">
                     <div class="col-lg-5 d-none d-lg-block bg-register-image">
-                        <img src="{{ asset('/storage/images/Logo/Logo.png') }}" alt="Logo" class="img-fluid" style="max-width: 80%; margin: 50px auto; display: block;">
+                        <a href="{{ route('index') }}">
+                            <img src="{{ asset('/storage/images/Logo/Logo.png') }}" alt="Logo" class="img-fluid" style="max-width: 80%; margin: 50px auto; display: block;">
+                        </a>
                     </div>
                     <div class="col-lg-7">
                         <div class="p-5">
@@ -40,13 +42,17 @@
                                         <input type="password" class="form-control form-control-user" id="exampleRepeatPassword" name="password_confirmation" placeholder="Nhập lại mật khẩu">
                                     </div>
                                 </div>
+                                <!-- CAPTCHA -->
+                                <div class="form-group">
+                                    {!! NoCaptcha::renderJs() !!}
+                                    {!! NoCaptcha::display() !!}
+                                    @error('g-recaptcha-response')
+                                    <span class="text-danger">{{ $message }}</span>
+                                    @enderror
+                                </div>
                                 <button type="submit" class="btn btn-primary btn-user btn-block">
                                     Đăng ký tài khoản
                                 </button>
-                                <hr>
-                                <a href="index.html" class="btn btn-google btn-user btn-block">
-                                    <i class="fab fa-google fa-fw"></i> Đăng ký với Google
-                                </a>
                             </form>
                             <hr>
                             <div class="text-center">
@@ -63,14 +69,3 @@
     </div>
 </div>
 @endsection
-@push('scripts')
-    @if(session('success'))
-        <script>
-            Swal.fire({
-                icon: 'success',
-                title: 'Đăng ký thành công',
-                text: '{{ session('success') }}',
-            });
-        </script>
-    @endif
-@endpush

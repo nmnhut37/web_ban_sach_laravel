@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Category;
+use App\Models\Banner;
+
 
 class CategoryController extends Controller
 {
@@ -18,16 +20,17 @@ class CategoryController extends Controller
     public function showCategory($id)
     {
         $category = Category::with('children')->findOrFail($id);
+        $banners = Banner::orderBy('order')->get();
 
         // Nếu là danh mục cha
         if (is_null($category->parent_id)) {
             $products = $category->products()->get();
-            return view('shop.parent_category', compact('category', 'products'));
+            return view('shop.parent_category', compact('category', 'products', 'banners'));
         }
 
         // Nếu là danh mục con
         $products = $category->products()->get();
-        return view('shop.child_category', compact('category', 'products'));
+        return view('shop.child_category', compact('category', 'products', 'banners'));
     }
 
     // Hiển thị danh sách danh mục cha
@@ -76,7 +79,7 @@ class CategoryController extends Controller
             'parent_id' => $parentCategoryId,
         ]);
 
-        return redirect()->route('categories.children', $parentCategoryId)->with('success', 'Danh mục con đã được thêm thành công.');
+        return redirect()->route('categories_children', $parentCategoryId)->with('success', 'Danh mục con đã được thêm thành công.');
     }
 
     // Hiển thị form tạo danh mục cha

@@ -21,7 +21,7 @@ class UserFactory extends Factory
             'phone' => $this->faker->numerify('###########'), // Số điện thoại 11 chữ số
             'date_of_birth' => $this->faker->date(),
             'address' => $this->faker->address(),
-            'avatar' => 'avatar.jpg', // Ảnh đại diện mặc định
+            'avatar' => 'profile.png', // Ảnh đại diện mặc định
             'status' => $this->faker->randomElement(['verified', 'unverified']),
             'verification_token' => null, // Đặt token trống
             'created_at' => now(),

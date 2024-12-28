@@ -4,9 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    
     <title>Trang sản phẩm</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.0/font/bootstrap-icons.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/datatables.net-bs4@1.13.1/css/dataTables.bootstrap4.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.5.1/dist/sweetalert2.min.css">
     <link href="{{ asset('css/style.css') }}" rel="stylesheet">
     @stack('styles')
 </head>
@@ -24,14 +28,14 @@
                         <div class="collapse navbar-collapse mx-5" id="navbarHeader">
                             <div class="w-100 d-flex flex-column flex-lg-row justify-content-center align-items-center gap-3">
                                 <!-- Logo -->
-                                <a href="{{ url('/') }}" class="navbar-brand">
+                                <a href="{{route('index')}}" class="navbar-brand">
                                     <img src="{{ asset('storage/images/Logo/Logo.png') }}" alt="Logo" style="width: 100px;">
                                 </a>
                                 <!-- Search Bar -->
-                                <form action="{{ url('/') }}" method="POST" class="d-flex w-100 w-lg-40 justify-content-center">
+                                <form action="{{ route('search.shop') }}" method="POST" class="d-flex w-100 w-lg-40 justify-content-center">
                                     @csrf
                                     <div class="input-group" style="max-width: 500px;">
-                                        <input type="text" name="tensp" class="form-control" placeholder="Tìm kiếm" aria-label="Search">
+                                        <input type="text" name="tensp" id="search-input" class="form-control" placeholder="Tìm kiếm" aria-label="Search" autocomplete="off">
                                         <button class="btn btn-primary" type="submit">
                                             <i class="bi bi-search"> Tìm kiếm</i>
                                         </button>
@@ -47,15 +51,20 @@
                                             </a>
                                             <ul class="dropdown-menu dropdown-menu-end shadow animated--grow-in" aria-labelledby="userDropdown">
                                                 <li>
-                                                    <a class="dropdown-item" href="{{ url('profile') }}">
+                                                    <a class="dropdown-item" href="{{route('profile.showProfile')}}">
                                                         <i class="bi bi-person-circle me-2"></i> Hồ sơ cá nhân
                                                     </a>
                                                 </li>
-                                                <li>
-                                                    <a class="dropdown-item" href="{{ url('settings') }}">
-                                                        <i class="bi bi-gear me-2"></i> Cài đặt
-                                                    </a>
-                                                </li>
+                                                @if(auth::user()->hasRole('admin') || auth::user()->hasRole('super_admin'))
+                                                    <li>
+                                                        <hr class="dropdown-divider">
+                                                    </li>
+                                                    <li>
+                                                        <a class="dropdown-item" href="{{ route('dashboard') }}">
+                                                            <i class="bi bi-house-door me-2"></i> Trang Admin
+                                                        </a>
+                                                    </li>
+                                                @endif
                                                 <li>
                                                     <hr class="dropdown-divider">
                                                 </li>
@@ -91,7 +100,7 @@
                         <div class="collapse navbar-collapse" id="navbarNav">
                             <ul class="navbar-nav w-100 d-flex justify-content-evenly">
                                 <li class="nav-item">
-                                    <a class="nav-link text-white" href="{{ url('/') }}">
+                                    <a class="nav-link text-white" href="{{ route('index') }}">
                                         <i class="bi bi-house fs-6 me-2"></i>Trang chủ
                                     </a>
                                 </li>
@@ -118,9 +127,13 @@
                                 </li>
                                 <li class="nav-item">
                                     <a class="nav-link text-white" href="{{ route('cart.index') }}">
-                                        <i class="bi bi-cart fs-6 me-2"></i>Giỏ Hàng
+                                        <span style="position: relative; display: inline-block;">
+                                            <i class="bi bi-cart fs-6 me-2"></i>
+                                            <span id="cart-count" class="badge bg-danger" style="position: absolute; top: -10px; right: -10px; font-size: 0.8rem;"></span>
+                                        </span>
+                                        Giỏ Hàng
                                     </a>
-                                </li>
+                                </li>                                                                
                             </ul>
                         </div>
                     </div>
@@ -133,15 +146,62 @@
     </main>
     <footer class="footer mt-5" style="background-color: #044785; color: #ffffff;">
         <div class="container py-4">
+            <div class="row">
+                <div class="col-md-6 text-center text-md-start">
+                    <h5>Về chúng tôi</h5>
+                    <p>Readbook Shop là cửa hàng trực tuyến chuyên cung cấp các loại sách đa dạng: sách học thuật, sách văn học, sách kỹ năng và nhiều hơn nữa. Sứ mệnh của chúng tôi là mang tri thức đến gần hơn với mọi người.</p>
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                    <h5>Liên hệ</h5>
+                    <p>
+                        Địa chỉ: 123 Đường Sách, TP. Tri Thức<br>
+                        Điện thoại: (0123) 456-7890<br>
+                        Email: support@readbookshop.com
+                    </p>
+                </div>
+            </div>
             <div class="text-center mt-3">
-                <p class="mb-0">© 2024 Công ty TNHH Readbook shop. Bảo lưu mọi quyền.</p>
+                <p class="mb-0">© 2024 Công ty TNHH Readbook Shop. Bảo lưu mọi quyền.</p>
             </div>
         </div>
     </footer>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-3-typeahead/4.0.1/bootstrap3-typeahead.min.js"></script>
     <script src="{{ asset('js/main.js') }}"></script>
+    <script src="{{ asset('js/cart.js') }}"></script>
+    <script>
+        var searchSuggestionsUrl = "{{ route('product.search.suggestions') }}";
+    </script>    
     @stack('scripts')
+    @if(session('warning'))
+    <script>
+        Swal.fire({
+            icon: 'warning',
+            title: 'Cảnh báo',
+            text: '{{ session('warning') }}',
+            confirmButtonText: 'OK'
+        });
+    </script>
+    @endif
+    @if(session('error'))
+        <script>
+            Swal.fire({
+                icon: 'error',
+                title: 'Đã xảy ra lỗi',
+                text: '{{ session('error') }}',
+            });
+        </script>
+    @endif
+    @if(session('success'))
+        <script>
+            Swal.fire({
+                icon: 'success',
+                title: 'Thành công!',
+                text: '{{ session('success') }}',
+            });
+        </script>
+    @endif
 </body>
 </html>

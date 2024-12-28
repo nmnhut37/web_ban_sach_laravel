@@ -41,6 +41,34 @@
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     @stack('scripts')
+    @if(session('warning'))
+    <script>
+        Swal.fire({
+            icon: 'warning',
+            title: 'Cảnh báo',
+            text: '{{ session('warning') }}',
+            confirmButtonText: 'OK'
+        });
+    </script>
+    @endif
+    @if(session('error'))
+        <script>
+            Swal.fire({
+                icon: 'error',
+                title: 'Đã xảy ra lỗi',
+                text: '{{ session('error') }}',
+            });
+        </script>
+    @endif
+    @if(session('success'))
+        <script>
+            Swal.fire({
+                icon: 'success',
+                title: 'Thành công!',
+                text: '{{ session('success') }}',
+            });
+        </script>
+    @endif
 </body>
 
 </html>

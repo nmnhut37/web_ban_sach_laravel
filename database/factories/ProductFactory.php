@@ -15,7 +15,7 @@ class ProductFactory extends Factory
         return [
             'product_name' => $this->faker->word(),
             'description' => $this->faker->paragraph(),
-            'price' => $this->faker->randomFloat(2, 10, 1000), // Giá từ 10 đến 1000
+            'price' => $this->faker->numberBetween(1000, 100000), // Giá từ 10 đến 1000
             'img' => 'demo.png',
             'stock_quantity' => $this->faker->numberBetween(1, 100), // Số lượng tồn kho ngẫu nhiên
             'purchase_count' => $this->faker->numberBetween(0, 500), // Số lượng mua ngẫu nhiên

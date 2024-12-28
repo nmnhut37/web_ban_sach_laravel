@@ -5,7 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class UserController extends Controller
 {
@@ -15,11 +16,13 @@ class UserController extends Controller
         $users = User::all(); // Lấy danh sách người dùng
         return view('admin.account_manage.user', compact('users'));
     }
+
     // Hiển thị form tạo người dùng mới
     public function create()
     {
         return view('admin.account_manage.user_create');
     }
+
     // Hiển thị form chỉnh sửa thông tin người dùng
     public function edit($id)
     {
@@ -27,6 +30,7 @@ class UserController extends Controller
         return view('admin.account_manage.user_edit', compact('user'));
     }
 
+    // Cập nhật thông tin người dùng
     public function update(Request $request, $id)
     {
         $user = User::findOrFail($id);
@@ -38,31 +42,33 @@ class UserController extends Controller
             'phone' => 'nullable|string|max:11',
             'date_of_birth' => 'nullable|date',
             'address' => 'nullable|string',
-            'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            // Thêm điều kiện validate cho mật khẩu nếu có
+            'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:5120',
             'password' => 'nullable|string|min:8|regex:/[A-Za-z]/|regex:/[\W_]/|confirmed',
         ]);
 
         // Kiểm tra nếu người dùng muốn thay đổi mật khẩu
         if ($request->filled('password')) {
-            $user->password = bcrypt($request->password);  // Mã hóa mật khẩu mới
+            $user->password = bcrypt($request->password); // Mã hóa mật khẩu mới
         }
 
-        // Cập nhật thông tin người dùng
+        // Xử lý avatar
         if ($request->hasFile('avatar')) {
-            // Xóa ảnh cũ nếu tồn tại
-            if ($user->avatar && file_exists(public_path('storage/images/user/' . $user->avatar))) {
-                unlink(public_path('storage/images/user/' . $user->avatar));
-            }
+            $file = $request->file('avatar');
 
-            // Lưu ảnh mới vào thư mục 'storage/images/user'
-            $avatarFile = $request->file('avatar');
-            $avatarName = time() . '-' . $avatarFile->getClientOriginalName();
-            $avatarFile->move(public_path('storage/images/user'), $avatarName);
-            $user->avatar = $avatarName;
+            if ($file->isValid()) {
+                // Xóa avatar cũ nếu tồn tại
+                if ($user->avatar && file_exists(public_path('storage/images/user/' . $user->avatar))) {
+                    unlink(public_path('storage/images/user/' . $user->avatar));
+                }
+
+                // Lưu avatar mới
+                $fileName = md5(time() . uniqid()) . '.' . $file->getClientOriginalExtension();
+                $file->move(public_path('storage/images/user'), $fileName);
+                $user->avatar = $fileName;
+            }
         }
 
-        // Cập nhật các trường còn lại
+        // Cập nhật các trường khác
         $user->name = $request->name;
         $user->email = $request->email;
         $user->phone = $request->phone;
@@ -75,12 +81,11 @@ class UserController extends Controller
         return redirect()->route('user.index')->with('success', 'Cập nhật thông tin người dùng thành công.');
     }
 
-
     public function destroy($id)
     {
         $user = User::findOrFail($id);
 
-        // Xóa ảnh nếu tồn tại
+        // Xóa avatar nếu tồn tại
         if ($user->avatar && file_exists(public_path('storage/images/user/' . $user->avatar))) {
             unlink(public_path('storage/images/user/' . $user->avatar));
         }
@@ -91,26 +96,25 @@ class UserController extends Controller
         return redirect()->route('user.index')->with('success', 'Xóa người dùng thành công.');
     }
 
-    
     public function store(Request $request)
     {
-        // Xác thực dữ liệu (bao gồm mật khẩu)
+        // Xác thực dữ liệu
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email|max:255',
             'password' => [
                 'required',
                 'string',
-                'min:8', // Mật khẩu phải có ít nhất 8 ký tự
-                'regex:/[A-Za-z]/', // Phải có ít nhất một chữ cái
-                'regex:/[\W_]/', // Phải có ít nhất một ký tự đặc biệt
-                'confirmed', // Kiểm tra xác nhận mật khẩu
+                'min:8',
+                'regex:/[A-Za-z]/',
+                'regex:/[\W_]/',
+                'confirmed',
             ],
             'address' => 'nullable|string|max:255',
             'phone' => 'nullable|string|max:15',
             'date_of_birth' => 'nullable|date',
             'status' => 'required|in:verified,unverified',
-            'avatar' => 'nullable|image|mimes:jpeg,png,gif|max:5120',  // 5MB limit for image files
+            'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120',
         ], [
             // Thông báo lỗi tùy chỉnh
             'name.required' => 'Họ và tên là bắt buộc.',
@@ -127,41 +131,37 @@ class UserController extends Controller
             'avatar.max' => 'Ảnh đại diện không được vượt quá 5MB.',
         ]);
 
-        // Kiểm tra nếu validate không thành công
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
         }
 
         // Xử lý upload avatar
-        $avatarName = null;
+        $fileName = null;
         if ($request->hasFile('avatar')) {
-            $avatarFile = $request->file('avatar');
-            if ($avatarFile->isValid()) {
-                $avatarName = time() . '-' . $avatarFile->getClientOriginalName();
-                $avatarFile->move(public_path('storage/images/user'), $avatarName);
+            $file = $request->file('avatar');
+            if ($file->isValid()) {
+                $fileName = md5(time() . uniqid()) . '.' . $file->getClientOriginalExtension();
+                $file->move(public_path('storage/images/user'), $fileName);
             }
         }
-        if (!$avatarName) {
-            return redirect()->back()->with('error', 'Không thể tải lên ảnh đại diện. Vui lòng thử lại.');
-        }
-        // Create a new user and store in database
+
+        // Tạo người dùng mới
         try {
             $user = new User();
             $user->name = $request->name;
-            $user->address = $request->address;
-            $user->phone = $request->phone;
             $user->email = $request->email;
+            $user->phone = $request->phone;
+            $user->address = $request->address;
             $user->date_of_birth = $request->date_of_birth;
             $user->status = $request->status;
-            $user->avatar = $avatarName;  // Store the image path in the database
-            $user->password = bcrypt($request->password);  // Mã hóa mật khẩu trước khi lưu
+            $user->avatar = $fileName;
+            $user->password = bcrypt($request->password);
             $user->save();
 
-            // Redirect with success message
             return redirect()->route('user.index')->with('success', 'Thêm người dùng mới thành công!');
         } catch (\Exception $e) {
+            Log::error('Error creating user: ' . $e->getMessage());
             return redirect()->back()->with('error', 'Không thể thêm người dùng. Vui lòng thử lại.');
         }
     }
-
 }

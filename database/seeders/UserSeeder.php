@@ -38,7 +38,7 @@ class UserSeeder extends Seeder
 
         // Tạo một người dùng với vai trò 'user' và mật khẩu là '123'
         User::factory()->create([
-            'name' => 'Regular User',
+            'name' => 'User',
             'email' => 'user@example.com',
             'role' => 'user',
             'status' => 'verified',

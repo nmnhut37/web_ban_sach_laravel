@@ -15,7 +15,6 @@
                     <i class="fas fa-fw fa-tachometer-alt"></i>
                     <span>Tổng quan</span></a>
             </li>
-
             <!-- Divider -->
             <hr class="sidebar-divider my-0">
 
@@ -23,7 +22,7 @@
             <li class="nav-item">
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseone"
                     aria-expanded="true" aria-controls="collapseone">
-                    <i class="bi bi-book fs-6"></i>
+                    <i class="bi bi-book-fill fs-6"></i>
                     <span>Quản lý sản phẩm</span>
                 </a>
                 <div id="collapseone" class="collapse" aria-labelledby="headingone" data-parent="#accordionSidebar">
@@ -36,20 +35,20 @@
             <li class="nav-item">
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsetwo"
                     aria-expanded="true" aria-controls="collapsetwo">
-                    <i class="bi bi-person fs-6"></i>
+                    <i class="bi bi-person-fill fs-6"></i>
                     <span>Quản lý thành viên</span>
                 </a>
                 <div id="collapsetwo" class="collapse" aria-labelledby="headingtwo" data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
                         <a class="collapse-item" href="{{route('user.index')}}">Thành viên</a>
-                        <a class="collapse-item" href="quanlybinhluan.php">Đánh giá sản phẩm</a>
+                        <a class="collapse-item" href="{{route('reviews.index')}}">Đánh giá sản phẩm</a>
                     </div>
                 </div>
             </li>
             <li class="nav-item">
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsetree"
                     aria-expanded="true" aria-controls="collapsetree">
-                    <i class="bi bi-shop fs-6"></i>
+                    <i class="fa-solid fa-store"></i>
                     <span>Quản lý cửa hàng</span>
                 </a>
                 <div id="collapsetree" class="collapse" aria-labelledby="headingtree" data-parent="#accordionSidebar">
@@ -60,13 +59,18 @@
                 </div>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="quanlydonhang.php">
-                    <i class="bi bi-credit-card fs-6"></i>
+                <a class="nav-link" href="{{route('orders.index')}}">
+                    <i class="bi bi-credit-card-fill fs-6"></i>
                     <span>Quản lý đơn hàng</span></a>
             </li>
             <!-- Divider -->
             <hr class="sidebar-divider d-none d-md-block">
-
+            <li class="nav-item">
+                <a class="nav-link" href="{{route('index')}}">
+                    <i class="bi bi-caret-left-square-fill fs-6"></i>
+                    <span>Đến trang bán hàng</span></a>
+            </li>
+            </br>
             <!-- Sidebar Toggler (Sidebar) -->
             <div class="text-center d-none d-md-inline">
                 <button class="rounded-circle border-0" id="sidebarToggle"></button>

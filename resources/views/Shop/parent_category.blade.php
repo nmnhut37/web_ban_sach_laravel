@@ -2,6 +2,9 @@
 
 @section('content')
 <div class="container my-4">
+    <!-- Carousel -->
+    @include('layout.carousel', ['banners' => $banners])
+    
     <h2 class="my-4">Danh mục: {{ $category->name }}</h2>
     <div class="row">
         @if ($products->isEmpty())
@@ -20,6 +23,7 @@
                             <div class="d-flex justify-content-between align-items-center">
                                 <span class="text-danger fw-bold" style="font-size: 1rem;">{{ number_format($product->price, 0, ',', '.') }} đ</span>
                             </div>
+                            <x-star-rating :productId="$product->id" />
                         </div>
                         <div class="card-footer text-center" style="background-color: #fff; border-top: 0px solid #ddd;">
                             <a href="#" class="btn btn-primary">Thêm vào giỏ</a>

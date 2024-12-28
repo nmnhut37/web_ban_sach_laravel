@@ -1,17 +1,19 @@
 @extends('Layout.master')
 
 @section('content')
-    <h1 class="h3 text-gray-800">Quản lý Banner</h1>
-
+    <!-- Page Heading -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 text-gray-800">Quản lý Banner</h1>
+        <a href="{{ route('banners.index') }}" class="btn btn-secondary btn-icon-split">
+            <span class="icon text-white-50">
+                <i class="fa fa-arrow-left"></i>
+            </span>
+            <span class="text">Quay lại danh sách</span>
+        </a>
+    </div>
     <div class="card shadow mb-4">
         <div class="card-header py-3">
             <h6 class="m-0 font-weight-bold text-primary">Chỉnh sửa Banner</h6>
-            <a href="{{ route('banners.index') }}" class="btn btn-secondary btn-icon-split">
-                <span class="icon text-white-50">
-                    <i class="fa fa-arrow-left"></i>
-                </span>
-                <span class="text">Quay lại danh sách</span>
-            </a>
         </div>
         <div class="card-body">
             <form action="{{ route('banners.update', $banner->id) }}" method="post" enctype="multipart/form-data">
@@ -34,7 +36,7 @@
                         <td>Hình hiện tại</td>
                         <td>
                             @if ($banner->image)
-                                <img src="{{ asset('storage/' . $banner->image) }}" alt="Banner" class="img-fluid" style="max-width: 200px;">
+                                <img src="{{ asset('storage/images/banner/' . $banner->image) }}" alt="Banner" class="img-fluid" style="max-width: 200px;">
                             @endif
                         </td>
                     </tr>
@@ -51,26 +53,4 @@
             </form>
         </div>
     </div>
-@endsection
-@section('js')
-@if(session('success'))
-    <script>
-        Swal.fire({
-            title: 'Thành công!',
-            text: '{{ session('success') }}',
-            icon: 'success',
-            confirmButtonText: 'OK'
-        });
-    </script>
-@endif
-@if(session('error'))
-    <script>
-        Swal.fire({
-            title: 'Lỗi!',
-            text: '{{ session('error') }}',
-            icon: 'error',
-            confirmButtonText: 'OK'
-        });
-    </script>
-@endif
 @endsection

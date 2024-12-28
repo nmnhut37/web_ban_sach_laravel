@@ -1,17 +1,19 @@
 @extends('Layout.master')
 
 @section('content')
-    <h1 class="h3 text-gray-800">Sửa sản phẩm</h1>
-
+    <!-- Page Heading -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 text-gray-800">Sửa sản phẩm</h1>
+        <a href="{{ route('product_list') }}" class="btn btn-secondary btn-icon-split">
+            <span class="icon text-white-50">
+                <i class="fa fa-arrow-left"></i>
+            </span>
+            <span class="text">Quay lại danh sách sản phẩm</span>
+        </a>
+    </div>
     <div class="card shadow mb-4">
         <div class="card-header py-3">
             <h6 class="m-0 font-weight-bold text-primary">Cập nhật thông tin sản phẩm</h6>
-            <a href="{{ route('product_list') }}" class="btn btn-secondary btn-icon-split">
-                <span class="icon text-white-50">
-                    <i class="fa fa-arrow-left"></i>
-                </span>
-                <span class="text">Quay lại danh sách</span>
-            </a>
         </div>
         <div class="card-body">
             <form action="{{ route('product.update', $product->id) }}" method="post" enctype="multipart/form-data">
@@ -71,26 +73,4 @@
             </form>
         </div>
     </div>
-@endsection
-@section('js')
-@if(session('success'))
-    <script>
-        Swal.fire({
-            title: 'Thành công!',
-            text: '{{ session('success') }}',
-            icon: 'success',
-            confirmButtonText: 'OK'
-        });
-    </script>
-@endif
-@if(session('error'))
-    <script>
-        Swal.fire({
-            title: 'Lỗi!',
-            text: '{{ session('error') }}',
-            icon: 'error',
-            confirmButtonText: 'OK'
-        });
-    </script>
-@endif
 @endsection

@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Models\Banner;
+use Illuminate\Support\Facades\Auth;
+use App\Models\Review;
+use App\Models\Order;
 
 class HomeController extends Controller
 {
@@ -17,6 +20,18 @@ class HomeController extends Controller
     public function show($id)
     {
         $product = Product::findOrFail($id);
-        return view('shop.product', compact('product'));
+        $userHasPurchased = false;
+        if (auth::check()) {
+            $userHasPurchased = Order::where('user_id', auth::id())
+            ->whereHas('orderItems', function ($query) use ($product) {
+                $query->where('product_id', $product->id);
+            })
+            ->exists();
+        }
+        
+        $reviews = Review::where('product_id', $product->id)
+        ->latest()
+        ->paginate(5);
+        return view('shop.product', compact('product', 'userHasPurchased', 'reviews'));
     }
 }

@@ -16,15 +16,26 @@ class OrderItem extends Model
         'price',
     ];
 
-    // Mối quan hệ với Order
+    /**
+     * Mối quan hệ với Order (đơn hàng chứa sản phẩm này)
+     */
     public function order()
     {
-        return $this->belongsTo(Order::class);
+        return $this->belongsTo(Order::class, 'order_id', 'id');
     }
 
-    // Mối quan hệ với Product
+    /**
+     * Mối quan hệ với Product (sản phẩm trong mục đơn hàng)
+     */
     public function product()
     {
-        return $this->belongsTo(Product::class);
+        return $this->belongsTo(Product::class, 'product_id', 'id');
+    }
+    /**
+     * Tính tổng tiền của item
+     */
+    public function getSubtotalAttribute()
+    {
+        return $this->quantity * $this->price;
     }
 }

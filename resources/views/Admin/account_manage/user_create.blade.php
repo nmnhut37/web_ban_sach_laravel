@@ -119,26 +119,6 @@
 @endsection
 
 @section('js')
-@if(session('success'))
-    <script>
-        Swal.fire({
-            title: 'Thành công!',
-            text: '{{ session('success') }}',
-            icon: 'success',
-            confirmButtonText: 'OK'
-        });
-    </script>
-@endif
-@if(session('error'))
-    <script>
-        Swal.fire({
-            title: 'Lỗi!',
-            text: '{{ session('error') }}',
-            icon: 'error',
-            confirmButtonText: 'OK'
-        });
-    </script>
-@endif
 
 <script>
     // Hàm preview hình ảnh khi người dùng chọn ảnh

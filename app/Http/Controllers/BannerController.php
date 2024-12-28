@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Banner;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 
 class BannerController extends Controller
 {
@@ -43,29 +43,39 @@ class BannerController extends Controller
             return redirect()->back()->with('error', 'Thứ tự banner đã tồn tại. Vui lòng chọn thứ tự khác.');
         }
 
-        // Xử lý upload hình ảnh
-        $imageName = null;
-        if ($request->hasFile('image')) {
-            $imageFile = $request->file('image');
-            if ($imageFile->isValid()) {
-                $imageName = time() . '-' . $imageFile->getClientOriginalName();
-                $imageFile->move(public_path('storage/images/Banner'), $imageName);
+        try {
+            // Xử lý upload hình ảnh
+            $imageName = null;
+            if ($request->hasFile('image')) {
+                $imageFile = $request->file('image');
+                if ($imageFile->isValid()) {
+                    $imageName = time() . '-' . $imageFile->getClientOriginalName();
+                    $imageFile->move(public_path('storage/images/Banner'), $imageName);
+                }
             }
+
+            if (!$imageName) {
+                return redirect()->back()->with('error', 'Không thể tải lên hình ảnh. Vui lòng thử lại.');
+            }
+
+            // Lưu thông tin banner vào cơ sở dữ liệu
+            Banner::create([
+                'image' => $imageName,
+                'description' => $request->description,
+                'order' => $request->order,
+                'url' => $request->url,
+            ]);
+
+            return redirect()->route('banners.index')->with('success', 'Thêm banner thành công!');
+        } catch (\Exception $e) {
+            // Log lỗi để kiểm tra (nếu cần)
+            Log::error('Lỗi thêm banner: ' . $e->getMessage());
+
+            // Trả về thông báo lỗi cho người dùng
+            return redirect()->back()->with('error', 'Đã xảy ra lỗi khi thêm banner. Vui lòng thử lại sau.');
         }
-
-        if (!$imageName) {
-            return redirect()->back()->with('error', 'Không thể tải lên hình ảnh. Vui lòng thử lại.');
-        }
-
-        Banner::create([
-            'image' => $imageName,
-            'description' => $request->description,
-            'order' => $request->order,
-            'url' => $request->url,
-        ]);
-
-        return redirect()->route('banners.index')->with('success', 'Thêm banner thành công!');
     }
+
 
     /**
      * Hiển thị form chỉnh sửa banner.

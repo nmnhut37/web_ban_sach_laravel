@@ -8,7 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="">
     <meta name="author" content="">
-
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Dashboard</title>
 
     <!-- Custom fonts for this template-->
@@ -21,7 +21,8 @@
     <link href="{{asset('css/sb-admin-2.min.css')}}" rel="stylesheet">
     <link href="{{asset('vendor/datatables/dataTables.bootstrap4.min.css')}}" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-
+    <script src="https://kit.fontawesome.com/a499b9415a.js" crossorigin="anonymous"></script>
+    @stack('styles')
 </head>
 
 <body id="page-top">
@@ -97,6 +98,7 @@
     </div>
 
     <!-- Bootstrap core JavaScript-->
+    
     <script src="{{asset('vendor/jquery/jquery.min.js')}}"></script>
     <script src="{{asset('vendor/bootstrap/js/bootstrap.bundle.min.js')}}"></script>
 
@@ -105,18 +107,37 @@
 
     <!-- Custom scripts for all pages-->
     <script src="{{asset('js/sb-admin-2.min.js')}}"></script>
-
-    <!-- Page level plugins -->
-    <script src="{{asset('vendor/chart.js/Chart.min.js')}}"></script>
-
-    <!-- Page level custom scripts -->
-    <script src="{{asset('js/demo/chart-area-demo.js')}}"></script>
-    <script src="{{asset('js/demo/chart-pie-demo.js')}}"></script>
-
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
+    @if(session('warning'))
+    <script>
+        Swal.fire({
+            icon: 'warning',
+            title: 'Cảnh báo',
+            text: '{{ session('warning') }}',
+            confirmButtonText: 'OK'
+        });
+    </script>
+    @endif
+    @if(session('error'))
+        <script>
+            Swal.fire({
+                icon: 'error',
+                title: 'Đã xảy ra lỗi',
+                text: '{{ session('error') }}',
+            });
+        </script>
+    @endif
+    @if(session('success'))
+        <script>
+            Swal.fire({
+                icon: 'success',
+                title: 'Thành công!',
+                text: '{{ session('success') }}',
+            });
+        </script>
+    @endif
     @yield('js')
-
+    @stack('scripts')
 </body>
 
 </html>

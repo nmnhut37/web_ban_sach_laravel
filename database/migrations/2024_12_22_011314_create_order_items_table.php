@@ -4,20 +4,20 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateOrderItemsTable extends Migration
+return new class extends Migration
 {
+    /**
+     * Run the migrations.
+     */
     public function up()
     {
         Schema::create('order_items', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('order_id');
-            $table->unsignedBigInteger('product_id');
+            $table->foreignId('order_id')->constrained()->onDelete('cascade'); // Liên kết với bảng orders
+            $table->foreignId('product_id')->constrained()->onDelete('cascade'); // Liên kết với bảng products
             $table->integer('quantity');
-            $table->decimal('price', 15, 2);
+            $table->unsignedInteger('price'); // Giá sản phẩm tại thời điểm đặt hàng
             $table->timestamps();
-
-            $table->foreign('order_id')->references('id')->on('orders')->onDelete('cascade');
-            $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
         });
     }
 
@@ -25,4 +25,5 @@ class CreateOrderItemsTable extends Migration
     {
         Schema::dropIfExists('order_items');
     }
-}
+
+};

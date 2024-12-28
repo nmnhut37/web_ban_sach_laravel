@@ -11,6 +11,10 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\SocialAuthController;
 use App\Http\Controllers\DiscountController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\OrderManageController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ReviewController;
 
 Route::get('/test', function () {return view('test.test');});
 
@@ -18,6 +22,11 @@ Route::get('/test', function () {return view('test.test');});
 Route::get('/', [HomeController::class, 'index'])->name('index');
 Route::get('/product/{id}', [HomeController::class, 'show'])->name('product.show');
 Route::get('/categories/{id}', [CategoryController::class, 'showCategory'])->name('category.show');
+Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store')->middleware('auth');
+
+Route::post('/search', [ProductController::class, 'searchshop'])->name('search.shop');
+Route::get('/search/products', [ProductController::class, 'searchSuggestions'])->name('product.search.suggestions');
+
 
 // Auth
 Route::get('register', [AuthController::class, 'showRegisterForm'])->name('register.form');
@@ -34,26 +43,44 @@ Route::post('password/reset', [AuthController::class, 'resetPassword'])->name('p
 Route::get('login/google', [SocialAuthController::class, 'redirectToGoogle'])->name('google.login');
 Route::get('login/google/callback', [SocialAuthController::class, 'handleGoogleCallback']);
 
-// Order
-Route::get('checkout', [OrderController::class, 'index'])->name('checkout.index');
-Route::get('checkout/create', [OrderController::class, 'create'])->name('checkout.create');
-Route::post('checkout', [OrderController::class, 'store'])->name('checkout.store');
-Route::get('checkout/{orderId}', [OrderController::class, 'show'])->name('checkout.show');
+// Profile
+Route::get('/profile', [ProfileController::class, 'showProfile'])->name('profile.showProfile');
+Route::post('/profile/update-profile', [ProfileController::class, 'updateProfile'])->name('profile.updateProfile');
+Route::post('/profile/update-avatar', [ProfileController::class, 'updateAvatar'])->name('profile.updateAvatar');
+Route::post('/profile/update-password', [ProfileController::class, 'updatePassword'])->name('profile.updatePassword');
+Route::get('/profile/orders/{order}', [ProfileController::class, 'show'])->name('order.details');
 
+// Cart
 Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
-Route::post('/cart/add/{productId}', [CartController::class, 'add'])->name('cart.add'); // Sửa name để đồng nhất
-Route::post('/cart/update', [CartController::class, 'update'])->name('cart.update'); // Route duy nhất cho cập nhật giỏ hàng
-Route::post('/cart/remove/{productId}', [CartController::class, 'remove'])->name('cart.remove');
-Route::post('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
-Route::post('/cart/apply-discount', [CartController::class, 'applyDiscount'])->name('cart.applyDiscount');
+Route::get('/cart/count', [CartController::class, 'getCartCount'])->name('cart.count');
+Route::post('/cart/update/{id}', [CartController::class, 'updateQuantity'])->name('cart.updateQuantity');
+Route::post('/cart/apply-coupon', [CartController::class, 'applyCoupon'])->name('cart.applyCoupon');
+Route::post('/cart/add/{id}', [CartController::class, 'addToCart'])->name('cart.add');
+Route::delete('/cart/delete/{id}', [CartController::class, 'delete'])->name('cart.delete');
+Route::post('/cart/checkout', [CartController::class, 'checkout'])->name('cart.checkout');
+
+
+// Order
+Route::get('checkout', [CartController::class, 'checkout'])->name('checkout.index');
+Route::post('checkout', [OrderController::class, 'store'])->name('checkout.store');
+Route::get('checkout/{orderId}', [ProfileController::class, 'show'])->name('checkout.show');
+
+// Payment
+Route::prefix('order')->name('order.')->group(function () {
+    Route::post('/store', [OrderController::class, 'store'])->name('store');
+    Route::get('/success', [OrderController::class, 'success'])->name('success');
+    Route::get('/failed', [OrderController::class, 'failed'])->name('failed');
+});
+Route::get('/payment/callback/{method}', [OrderController::class, 'handlePaymentCallback'])->name('payment.callback');
+
+
+
 
 // Middleware auth và admin vẫn được giữ nguyên
 Route::middleware(['auth', 'admin'])->group(function () {
 
     // Dashboard
-    Route::get('admin', function () {
-        return view('admin.dashboard');
-    })->name('dashboard');
+    Route::get('admin', [DashboardController::class, 'index'])->name('dashboard');
 
     // User Routes
     Route::middleware(['superadmin'])->group(function () { // Middleware chỉ dành cho Super Admin
@@ -101,4 +128,26 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('admin/discounts/{discount}/edit', [DiscountController::class, 'edit'])->name('discounts.edit');
     Route::put('admin/discounts/{discount}', [DiscountController::class, 'update'])->name('discounts.update');
     route::delete('admin/discounts/{discount}', [DiscountController::class, 'destroy'])->name('discounts.destroy');
+
+    // Order Manage
+    Route::get('admin/orders', [OrderManageController::class, 'index'])->name('orders.index');
+    route::get('admin/orders/create', [OrderManageController::class, 'create'])->name('orders.create');
+    Route::post('admin/orders', [OrderManageController::class, 'store'])->name('orders.store');
+    Route::get('admin/orders/{order}/edit', [OrderManageController::class, 'edit'])->name('orders.edit');
+    Route::put('admin/orders/{order}', [OrderManageController::class, 'update'])->name('orders.update');
+    Route::delete('admin/orders/{order}', [OrderManageController::class, 'destroy'])->name('orders.destroy');
+    Route::get('admin/orders/{order}', [OrderManageController::class, 'show'])->name('orders.show');
+    Route::get('/products/search', [ProductController::class, 'search'])->name('products.search');
+    Route::post('/orders/{orderId}/items/add', [OrderManageController::class, 'addItem'])->name('orders.items.add');
+    Route::delete('/orders/{orderId}/items/{itemId}', [OrderManageController::class, 'destroyOrderItem'])->name('orders.items.destroy');
+
+    // Review Manage
+    Route::get('admin/reviews', [ReviewController::class, 'index'])->name('reviews.index');
+    Route::get('admin/reviews/create', [ReviewController::class, 'create'])->name('reviews.create');
+    Route::post('admin/reviews', [ReviewController::class, 'add'])->name('reviews.add');
+    Route::get('admin/reviews/{id}/edit', [ReviewController::class, 'edit'])->name('reviews.edit');
+    Route::put('admin/reviews/{id}', [ReviewController::class, 'update'])->name('reviews.update');
+    Route::delete('admin/reviews/{id}', [ReviewController::class, 'destroy'])->name('reviews.destroy');
+    Route::get('reviews/getProductsByCategory', [ReviewController::class, 'getProductsByCategory'])->name('reviews.getProductsByCategory');
+
 });

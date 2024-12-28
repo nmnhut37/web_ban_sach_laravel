@@ -19,7 +19,7 @@
     </div>
     <div class="card-body">
         <div class="table-responsive">
-            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+            <table class="table table-bordered delete-review" id="dataTable" width="100%" cellspacing="0">
                 <thead>
                     <tr>
                         <th>ID</th>
@@ -54,7 +54,7 @@
                                 <a href="{{ route('banners.edit', $banner->id) }}" class="btn btn-info btn-circle">
                                     <i class="bi bi-pencil-fill"></i>
                                 </a>
-                                <form action="{{ route('banners.destroy', $banner->id) }}" method="POST" style="display: inline;" onsubmit="return confirm('Bạn có chắc chắn muốn xóa?')">
+                                <form action="{{ route('banners.destroy', $banner->id) }}" method="POST" style="display: inline;" class="delete-review-form">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="btn btn-danger btn-circle">
@@ -103,26 +103,30 @@
         });
     });
 </script>
-@endsection
-@section('js')
-@if(session('success'))
-    <script>
-        Swal.fire({
-            title: 'Thành công!',
-            text: '{{ session('success') }}',
-            icon: 'success',
-            confirmButtonText: 'OK'
+<script>
+    $(document).ready(function() {
+        // Lắng nghe sự kiện submit của form xóa
+        $('.delete-review-form').submit(function(e) {
+            e.preventDefault(); // Ngừng hành động mặc định của form
+
+            var form = this;
+
+            // Hiển thị SweetAlert để xác nhận
+            Swal.fire({
+                title: 'Bạn có chắc chắn muốn xóa banner này?',
+                text: "Hành động này không thể hoàn tác!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Xóa',
+                cancelButtonText: 'Hủy',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Nếu chọn "Xóa", submit form
+                    form.submit();
+                }
+            });
         });
-    </script>
-@endif
-@if(session('error'))
-    <script>
-        Swal.fire({
-            title: 'Lỗi!',
-            text: '{{ session('error') }}',
-            icon: 'error',
-            confirmButtonText: 'OK'
-        });
-    </script>
-@endif
+    });
+</script>
 @endsection

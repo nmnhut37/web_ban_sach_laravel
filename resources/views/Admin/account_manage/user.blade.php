@@ -19,7 +19,7 @@
     </div>
     <div class="card-body">
         <div class="table-responsive">
-            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+            <table class="table table-bordered delete-review" id="dataTable" width="100%" cellspacing="0">
                 <thead>
                     <tr>
                         <th>ID</th>
@@ -68,10 +68,10 @@
                             </td>
                             <td>
                                 <a href="{{ route('user.edit', $user->id) }}" class="btn btn-info btn-circle"><i class="bi bi-pencil-fill"></i></a>
-                                <form action="{{ route('user.destroy', $user->id) }}" method="POST" style="display: inline;">
+                                <form action="{{ route('user.destroy', $user->id) }}" method="POST" style="display: inline;" class="delete-review-form">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="btn btn-danger btn-circle" onclick="return confirm('Bạn có chắc chắn muốn xóa tài khoản này?')">
+                                    <button type="submit" class="btn btn-danger btn-circle">
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </form>
@@ -124,14 +124,30 @@
         $('[data-toggle="tooltip"]').tooltip();
     });
 </script>
-    <script>
-        @if(session('error'))
-        <script>
+<script>
+    $(document).ready(function() {
+        // Lắng nghe sự kiện submit của form xóa
+        $('.delete-review-form').submit(function(e) {
+            e.preventDefault(); // Ngừng hành động mặc định của form
+
+            var form = this;
+
+            // Hiển thị SweetAlert để xác nhận
             Swal.fire({
-                icon: 'error',
-                text: '{{ session('error') }}',
+                title: 'Bạn có chắc chắn muốn xóa người dùng này?',
+                text: "Hành động này không thể hoàn tác!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Xóa',
+                cancelButtonText: 'Hủy',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Nếu chọn "Xóa", submit form
+                    form.submit();
+                }
             });
-            </script>
-            @endif
-    </script>
+        });
+    });
+</script>
 @endsection

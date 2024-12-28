@@ -8,7 +8,9 @@
             <div class="card-body p-0">
                 <div class="row">
                     <div class="col-lg-6 d-none d-lg-block bg-login-image">
-                        <img src="{{ asset('/storage/images/Logo/Logo.png') }}" alt="Logo" class="img-fluid" style="max-width: 80%; margin: 50px auto; display: block;">
+                        <a href="{{ route('index') }}">
+                            <img src="{{ asset('/storage/images/Logo/Logo.png') }}" alt="Logo" class="img-fluid" style="max-width: 80%; margin: 50px auto; display: block;">
+                        </a>
                     </div>
                     <div class="col-lg-6">
                         <div class="p-5">
@@ -58,14 +60,3 @@
     </div>
 </div>   
 @endsection
-@push('scripts')
-    @if(session('error'))
-        <script>
-            Swal.fire({
-                icon: 'error',
-                title: 'Đăng nhập không thành công',
-                text: '{{ session('error') }}',
-            });
-        </script>
-    @endif
-@endpush

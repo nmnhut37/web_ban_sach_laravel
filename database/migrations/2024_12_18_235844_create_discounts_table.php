@@ -16,7 +16,7 @@ class CreateDiscountsTable extends Migration
         Schema::create('discounts', function (Blueprint $table) {
             $table->id();
             $table->string('code')->unique(); // Mã giảm giá
-            $table->decimal('discount_percentage', 5, 2); // Tỷ lệ giảm giá
+            $table->int('discount_percentage'); // Tỷ lệ giảm giá
             $table->date('expires_at'); // Ngày hết hạn
             $table->timestamps();
         });

@@ -20,6 +20,13 @@ class AuthController extends Controller
 
     public function register(RegisterRequest $request)
     {
+        // Xác thực CAPTCHA
+        $request->validate([
+            'g-recaptcha-response' => 'required|captcha',
+        ], [
+            'g-recaptcha-response.required' => 'Vui lòng xác minh bạn không phải là robot.',
+            'g-recaptcha-response.captcha' => 'CAPTCHA không hợp lệ.',
+        ]);
         $validated = $request->validated();
 
         $user = User::create([
@@ -64,12 +71,11 @@ class AuthController extends Controller
         if (Auth::attempt($credentials)) {
             $user = Auth::user();
 
-            if ($user->status !== 'verified') {
-                Auth::logout();
-                return back()->with('error', 'Tài khoản của bạn chưa được xác thực. Vui lòng kiểm tra email của bạn.');
+            if ($user->role === 'admin' || $user->role === 'super_admin') {
+                return redirect()->route('dashboard');
             }
-
-            return redirect()->route('dashboard');
+    
+            return redirect()->route('index');
         }
 
         return back()->withErrors(['email' => 'Thông tin đăng nhập không đúng.'])->withInput();
