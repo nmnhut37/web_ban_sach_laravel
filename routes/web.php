@@ -28,6 +28,8 @@ Route::post('/search', [ProductController::class, 'searchshop'])->name('search.s
 Route::get('/search/products', [ProductController::class, 'searchSuggestions'])->name('product.search.suggestions');
 
 
+
+
 // Auth
 Route::get('register', [AuthController::class, 'showRegisterForm'])->name('register.form');
 Route::post('register', [AuthController::class, 'register'])->name('register');

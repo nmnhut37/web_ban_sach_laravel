@@ -118,5 +118,7 @@ class ProfileController extends Controller
     {
         $order = Order::with('items.product')->findOrFail($id);
         return view('shop.profile.order_detail', compact('order'));
+        
     }
+    
 }

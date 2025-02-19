@@ -12,11 +12,14 @@ class OrderFactory extends Factory
 
     public function definition()
     {
+        // Chọn một người dùng ngẫu nhiên hoặc null nếu không có người dùng
+        $user = User::inRandomOrder()->first();
+
         return [
-            'user_id' => User::inRandomOrder()->first()->id ?? null, // Chọn một người dùng ngẫu nhiên hoặc null nếu không có người dùng
+            'user_id' => $user->id ?? null,
             'order_number' => 'ORD-' . $this->faker->unique()->numberBetween(100000, 999999),
-            'name' => $this->faker->name,
-            'email' => $this->faker->unique()->safeEmail,
+            'name' => $user->name ?? $this->faker->name, // Lấy tên từ User hoặc đặt ngẫu nhiên
+            'email' => $user->email ?? $this->faker->unique()->safeEmail, // Lấy email từ User hoặc đặt ngẫu nhiên
             'phone' => $this->faker->phoneNumber,
             'address' => $this->faker->address,
             'note' => $this->faker->optional()->sentence,
@@ -25,7 +28,6 @@ class OrderFactory extends Factory
             'final_amount' => $this->faker->numberBetween(100000, 1000000),
             'payment_method' => $this->faker->randomElement(['COD', 'MoMo', 'VNPay']),
             'order_status' => $this->faker->randomElement(['pending', 'processing', 'completed', 'cancelled']),
-
             'created_at' => $this->faker->dateTimeBetween('2024-01-01', '2024-12-31'),
             'updated_at' => $this->faker->dateTimeBetween('2024-01-01', '2024-12-31'),
         ];

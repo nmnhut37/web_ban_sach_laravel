@@ -8,14 +8,14 @@
 
 <div class="col-lg-4">
     <div class="border p-3 mt-4 mt-lg-0 rounded">
-        <h4 class="header-title mb-3">Tóm tắt đơn hàng</h4>
+        <h4 class="header-title mb-3">Tóm tắt hóa đơn</h4>
         <div class="table-responsive">
             <table class="table table-centered mb-0">
                 <tbody>
                     @foreach($cart as $item)
                     <tr>
                         <td>
-                            <img src="{{ asset('storage/images/product/' . $item['img']) }}" alt="product-img" class="rounded mr-2" height="48">
+                            <img src="{{ asset('storage/images/product/' . ($item['img'] ?? 'no-image.jpg')) }}" alt="product-img" class="rounded mr-2" height="48">
                             <p class="m-0 d-inline-block align-middle">
                                 <span class="text-body font-weight-semibold">{{ $item['product_name'] }}</span>
                                 <br>

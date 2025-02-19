@@ -21,7 +21,7 @@ class WelcomeMail extends Mailable
     // Xây dựng email
     public function build()
     {
-        return $this->view('Mails.welcome')
+        return $this->view('mails.welcome')
             ->subject('Xác nhận tài khoản của bạn')
             ->with([
                 'user' => $this->user,

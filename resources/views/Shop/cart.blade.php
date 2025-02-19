@@ -20,11 +20,7 @@
                             @forelse($cart as $id => $item)
                             <tr data-id="{{ $id }}">
                                 <td>
-                                    @if(isset($item['img']))
-                                        <img src="{{ asset('storage/images/product/' . $item['img']) }}" alt="{{ $item['product_name'] }}" class="rounded mr-3" height="72">
-                                    @else
-                                        <img src="{{ asset('storage/images/product/demo.png') }}" alt="{{ $item['product_name'] }}" class="rounded mr-3" height="72">
-                                    @endif
+                                    <img src="{{ asset('storage/images/product/' . ($item['img'] ?? 'no-image.jpg')) }}" alt="{{ $item['product_name'] }}" class="rounded mr-3" height="72">
                                     <p class="m-0 d-inline-block align-middle font-16">
                                         <a href="{{ route('product.show', ['id' => $id]) }}" class="text-body">{{ $item['product_name'] }}</a>
                                     </p>

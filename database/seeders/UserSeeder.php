@@ -21,7 +21,7 @@ class UserSeeder extends Seeder
         // Tạo một người dùng với vai trò 'super_admin' và mật khẩu là '123'
         User::factory()->create([
             'name' => 'Super Admin',
-            'email' => 'superadmin@example.com',
+            'email' => 'superadmin@gmail.com',
             'role' => 'super_admin',
             'status' => 'verified',
             'password' => Hash::make('123'), // Mã hóa mật khẩu
@@ -30,7 +30,7 @@ class UserSeeder extends Seeder
         // Tạo một người dùng với vai trò 'admin' và mật khẩu là '123'
         User::factory()->create([
             'name' => 'Admin',
-            'email' => 'admin@example.com',
+            'email' => 'admin@gmail.com',
             'role' => 'admin',
             'status' => 'verified',
             'password' => Hash::make('123'), // Mã hóa mật khẩu
@@ -39,7 +39,7 @@ class UserSeeder extends Seeder
         // Tạo một người dùng với vai trò 'user' và mật khẩu là '123'
         User::factory()->create([
             'name' => 'User',
-            'email' => 'user@example.com',
+            'email' => 'user@gmail.com',
             'role' => 'user',
             'status' => 'verified',
             'password' => Hash::make('123'), // Mã hóa mật khẩu

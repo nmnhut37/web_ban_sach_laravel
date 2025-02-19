@@ -40,7 +40,7 @@
                                             <i class="bi bi-search"> Tìm kiếm</i>
                                         </button>
                                     </div>
-                                </form>
+                                </form>                              
                                 <!-- User Actions -->
                                 <div class="d-flex justify-content-center align-items-center">
                                     @auth
@@ -167,13 +167,13 @@
     </footer>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-3-typeahead/4.0.1/bootstrap3-typeahead.min.js"></script>
-    <script src="{{ asset('js/main.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="{{ asset('js/cart.js') }}"></script>
+    <script src="{{ asset('js/main.js') }}"></script>
     <script>
         var searchSuggestionsUrl = "{{ route('product.search.suggestions') }}";
-    </script>    
+    </script>
     @stack('scripts')
     @if(session('warning'))
     <script>

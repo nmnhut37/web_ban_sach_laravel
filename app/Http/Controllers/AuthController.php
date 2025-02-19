@@ -27,8 +27,10 @@ class AuthController extends Controller
             'g-recaptcha-response.required' => 'Vui lòng xác minh bạn không phải là robot.',
             'g-recaptcha-response.captcha' => 'CAPTCHA không hợp lệ.',
         ]);
+        
         $validated = $request->validated();
 
+        // Tạo người dùng mới
         $user = User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
@@ -37,11 +39,12 @@ class AuthController extends Controller
             'verification_token' => sha1(time()),
         ]);
 
+        // Gửi email xác nhận
         Mail::to($user->email)->send(new WelcomeMail($user));
 
-        return redirect()->route('login')->with('success', 'Đã gửi email xác nhận. Vui lòng kiểm tra email của bạn.');
+        // Chuyển đến view thông báo đã gửi email kích hoạt tài khoản
+        return view('auth.success')->with('message', 'Đã gửi email xác nhận. Vui lòng kiểm tra email của bạn để kích hoạt tài khoản.');
     }
-
     public function verify($token)
     {
         $user = User::where('verification_token', $token)->first();
@@ -50,15 +53,11 @@ class AuthController extends Controller
             $user->status = 'verified';
             $user->verification_token = null;
             $user->save();
-
             Auth::login($user);
-
-            return redirect()->route('dashboard')->with('success', 'Tài khoản của bạn đã được xác nhận thành công. Bạn đã được đăng nhập.');
+            return redirect()->route('login')->with('success', 'Tài khoản của bạn đã được xác nhận thành công. Bạn có thể đăng nhập ngay.');
         }
-
         return redirect()->route('login')->withErrors(['error' => 'Liên kết xác nhận không hợp lệ.']);
     }
-
     public function showLoginForm()
     {
         return view('login');
@@ -80,21 +79,18 @@ class AuthController extends Controller
 
         return back()->withErrors(['email' => 'Thông tin đăng nhập không đúng.'])->withInput();
     }
-
     public function logout(Request $request)
     {
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('login')->with('success', 'Bạn đã đăng xuất thành công.');
+        return redirect()->route('login');
     }
-
     public function showForgotForm()
     {
         return view('forgot_password');
     }
-
     public function forgotPassword(Request $request)
     {
         $request->validate(['email' => 'required|email|exists:users,email']);
@@ -108,7 +104,6 @@ class AuthController extends Controller
 
         return back()->with('success', 'Một liên kết đặt lại mật khẩu đã được gửi đến email của bạn.');
     }
-
     public function showResetForm($token)
     {
         $user = User::where('verification_token', $token)->first();
@@ -119,7 +114,6 @@ class AuthController extends Controller
 
         return view('reset', ['token' => $token]);
     }
-
     public function resetPassword(Request $request)
     {
         $request->validate([

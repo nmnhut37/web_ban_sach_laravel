@@ -32,7 +32,7 @@
                         <div class="text-center">
                             <!-- Hiển thị ảnh đại diện -->
                             <img id="avatar_preview" class="img-account-profile rounded-circle mb-2" 
-                                src="{{ asset('/storage/images/user/' . Auth::user()->avatar) }}" 
+                                src="{{ asset('/storage/images/user/' . (Auth::user()->avatar ?? 'test.svg')) }}" 
                                 alt="Avatar" width="200" height="200">
                             <br>
                             <!-- Trạng thái hình ảnh -->

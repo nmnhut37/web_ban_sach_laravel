@@ -8,6 +8,7 @@ use App\Models\Category;
 use Illuminate\Support\Facades\Log;
 use App\Models\Banner;
 
+
 class ProductController extends Controller
 {
     // Hiển thị danh sách sản phẩm
@@ -16,14 +17,12 @@ class ProductController extends Controller
         $products = Product::with('category')->get();
         return view('Admin.product_manage.Product.product_list', compact('products'));
     }
-
     // Hiển thị form thêm sản phẩm
     public function create()
     {
         $categories = Category::whereNotNull('parent_id')->get();
         return view('Admin.product_manage.product.product_create', compact('categories'));
     }
-
     // Lưu sản phẩm mới
     public function store(Request $request)
     {
@@ -59,7 +58,6 @@ class ProductController extends Controller
 
         return redirect()->route('product_list')->with('success', 'Sản phẩm đã được thêm thành công');
     }
-
     // Hiển thị form sửa sản phẩm
     public function edit($id)
     {
@@ -67,7 +65,6 @@ class ProductController extends Controller
         $categories = Category::whereNotNull('parent_id')->get();
         return view('Admin.product_manage.product.product_edit', compact('product', 'categories'));
     }
-
     // Cập nhật thông tin sản phẩm
     public function update(Request $request, $id)
     {
@@ -117,7 +114,6 @@ class ProductController extends Controller
 
         return redirect()->route('product_list')->with('success', 'Thông tin sản phẩm đã được cập nhật thành công');
     }
-
     // Xóa sản phẩm
     public function destroy($id)
     {
@@ -168,7 +164,7 @@ class ProductController extends Controller
         // Trả về kết quả tìm kiếm (có thể trả về view hoặc JSON tùy nhu cầu)
         return view('shop.search', compact('products', 'banners'));
     }
-
+    // Phương thức để lấy gợi ý sản phẩm
     // Phương thức để lấy gợi ý sản phẩm
     public function searchSuggestions(Request $request)
     {
@@ -198,6 +194,5 @@ class ProductController extends Controller
             return response()->json([], 200);
         }
     }
-
-
+    
 }

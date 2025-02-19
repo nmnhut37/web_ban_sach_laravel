@@ -41,34 +41,41 @@
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     @stack('scripts')
-    @if(session('warning'))
     <script>
-        Swal.fire({
-            icon: 'warning',
-            title: 'Cảnh báo',
-            text: '{{ session('warning') }}',
-            confirmButtonText: 'OK'
+        // Tự động đóng các thông báo SweetAlert sau một khoảng thời gian
+        document.addEventListener('DOMContentLoaded', function() {
+            @if(session('success'))
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Thành công!',
+                    text: '{{ session('success') }}',
+                    timer: 2500, // Thời gian tự động đóng sau 2 giây
+                    showConfirmButton: false
+                });
+            @endif
+    
+            @if(session('error'))
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Đã xảy ra lỗi',
+                    text: '{{ session('error') }}',
+                    timer: 2500, // Thời gian tự động đóng sau 2 giây
+                    showConfirmButton: false
+                });
+            @endif
+    
+            @if(session('warning'))
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Cảnh báo',
+                    text: '{{ session('warning') }}',
+                    timer: 2500, // Thời gian tự động đóng sau 2 giây
+                    showConfirmButton: false
+                });
+            @endif
         });
     </script>
-    @endif
-    @if(session('error'))
-        <script>
-            Swal.fire({
-                icon: 'error',
-                title: 'Đã xảy ra lỗi',
-                text: '{{ session('error') }}',
-            });
-        </script>
-    @endif
-    @if(session('success'))
-        <script>
-            Swal.fire({
-                icon: 'success',
-                title: 'Thành công!',
-                text: '{{ session('success') }}',
-            });
-        </script>
-    @endif
+    
 </body>
 
 </html>

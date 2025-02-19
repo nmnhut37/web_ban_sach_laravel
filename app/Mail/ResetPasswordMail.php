@@ -22,7 +22,7 @@ class ResetPasswordMail extends Mailable
     // Build email
     public function build()
     {
-        return $this->view('Mails.reset_password') // View sẽ sử dụng để gửi email
+        return $this->view('mails.reset_password') // View sẽ sử dụng để gửi email
             ->subject('Đặt lại mật khẩu') // Tiêu đề email
             ->with([
                 'user' => $this->user,

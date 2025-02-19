@@ -41,7 +41,7 @@
         <div class="row">
             <!-- Phần 1: Thông tin sản phẩm -->
             <div class="col-md-6">
-                <img src="{{ asset('storage/images/product/' . $product->img) }}" class="img-fluid" alt="{{ $product->product_name }}">
+                <img src="{{ asset('storage/images/product/' . ($product->img ?? 'no-image.jpg')) }}" class="img-fluid" alt="{{ $product->product_name }}">
             </div>
             <div class="col-md-6">
                 <h2 style="font-size: 3rem;">{{ $product->product_name }}</h2>
@@ -62,7 +62,6 @@
                 </div>
                 
                 <div class="d-flex gap-2 mt-3">
-                    <a href="#" class="btn btn-success">Mua ngay</a>
                     <a href="javascript:void(0)" class="btn btn-primary" id="addToCart">
                         <i class="bi bi-cart-plus"></i> Thêm vào giỏ
                     </a>

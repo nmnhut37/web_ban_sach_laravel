@@ -7,6 +7,8 @@ use App\Models\OrderItem;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\OrderSuccessMail;
 
 
 class PaymentService
@@ -57,6 +59,9 @@ class PaymentService
                 'price' => $item['price'],
             ]);
         }
+
+        Mail::to($order->email)->send(new OrderSuccessMail($order));
+
         $request->session()->put('order_id', $order->id);
         session()->forget(['cart', 'cart_total', 'discount_amount', 'final_total', 'coupon']);
 
@@ -106,7 +111,7 @@ class PaymentService
             "vnp_IpAddr" => request()->ip(), // Thêm IP người dùng
             "vnp_Locale" => "vn",           // Thêm ngôn ngữ
             "vnp_OrderInfo" => $vnp_OrderInfo,
-            "vnp_OrderType" => "billpayment", // Thêm loại thanh toán
+            "vnp_OrderType" => "ncb", // Thêm loại thanh toán
             "vnp_ReturnUrl" => $vnp_ReturnUrl,
             "vnp_TxnRef" => $vnp_TxnRef
         );
@@ -190,6 +195,9 @@ class PaymentService
                             $discountAmount,
                             $finalTotal
                         );
+
+                        Mail::to($order->email)->send(new OrderSuccessMail($order));
+
                         session()->forget('checkout_info');
                         return redirect()
                             ->route('order.success')
@@ -197,13 +205,13 @@ class PaymentService
                     } catch (\Exception $e) {
                         Log::error('VNPay Callback Error: ' . $e->getMessage());
                         return redirect()
-                            ->route('checkout')
+                            ->route('checkout.index')
                             ->with('error', 'Có lỗi xảy ra trong quá trình xử lý đơn hàng.');
                     }
     
                 case '24': // Người dùng hủy thanh toán
                     return redirect()
-                        ->route('checkout')
+                        ->route('checkout.index')
                         ->with('warning', 'Bạn đã hủy thanh toán. Đơn hàng chưa được tạo.');
     
                 default: // Các trường hợp lỗi khác

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Category;
 use App\Models\Banner;
+use App\Models\Product;
 
 
 class CategoryController extends Controller
@@ -24,7 +25,12 @@ class CategoryController extends Controller
 
         // Nếu là danh mục cha
         if (is_null($category->parent_id)) {
-            $products = $category->products()->get();
+            // Lấy danh sách ID của danh mục cha và các danh mục con
+            $categoryIds = $category->children->pluck('id')->prepend($category->id);
+
+            // Lấy sản phẩm của danh mục cha và danh mục con
+            $products = Product::whereIn('category_id', $categoryIds)->get();
+
             return view('shop.parent_category', compact('category', 'products', 'banners'));
         }
 
@@ -32,6 +38,7 @@ class CategoryController extends Controller
         $products = $category->products()->get();
         return view('shop.child_category', compact('category', 'products', 'banners'));
     }
+
 
     // Hiển thị danh sách danh mục cha
     public function index()
@@ -99,17 +106,16 @@ class CategoryController extends Controller
     public function edit($id)
     {
         $category = Category::findOrFail($id);
-        $parentCategories = Category::whereNull('parent_id')->get();
-        return view('admin.product_manage.category.categories_edit', compact('category', 'parentCategories'));
+        $categories = Category::whereNull('parent_id')->where('id', '!=', $id)->get(); // Loại trừ danh mục hiện tại
+        return view('admin.product_manage.category.categories_edit', compact('category', 'categories'));
     }
-
     // Cập nhật danh mục
     public function update(Request $request, $id)
     {
         $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'parent_id' => 'nullable|exists:categories,id',
+            'parent_id' => 'nullable|exists:categories,id|not_in:' . $id, // Không cho phép danh mục cha là chính nó
         ]);
 
         $category = Category::findOrFail($id);
@@ -119,9 +125,8 @@ class CategoryController extends Controller
             'parent_id' => $request->parent_id,
         ]);
 
-        return redirect()->route('categories.index')->with('success', 'Danh mục đã được cập nhật.');
+        return redirect()->route('categories.index')->with('success', 'Danh mục đã được cập nhật thành công.');
     }
-
     // Xóa danh mục
     public function destroy($id)
     {

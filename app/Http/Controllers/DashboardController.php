@@ -63,7 +63,7 @@ class DashboardController extends Controller
                 ];
             });
 
-            return view('admin.dashboard', compact(
+            return view('Admin.dashboard', compact(
                 'currentMonthSales', 'totalSales', 'processingOrders', 'shippingOrders', 'incomeData', 'orderData'
             ));
         } catch (\Exception $e) {

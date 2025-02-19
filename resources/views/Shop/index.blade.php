@@ -12,7 +12,7 @@
             <div class="col-6 col-sm-4 col-md-3 custom-5-column mb-4">
                 <div class="card h-100 product-card" data-product-id="{{ $product->id }}" data-stock-quantity="{{ $product->stock_quantity }}">
                     <a href="{{ route('product.show', $product->id) }}">
-                        <img src="{{ asset('storage/images/product/' . $product->img) }}" class="card-img-top" alt="{{ $product->product_name }}">
+                        <img src="{{ asset('storage/images/product/' . ($product->img ?? 'no-image.jpg')) }}" class="card-img-top" alt="{{ $product->product_name }}">
                     </a>
                     <div class="card-body">
                         <a href="{{ route('product.show', $product->id) }}" class="text-decoration-none">
@@ -47,7 +47,7 @@
         <div class="col-6 col-sm-4 col-md-3 custom-5-column mb-4">
             <div class="card h-100 product-card" data-product-id="{{ $product->id }}" data-stock-quantity="{{ $product->stock_quantity }}">
                 <a href="{{ route('product.show', $product->id) }}">
-                    <img src="{{ asset('storage/images/product/' . $product->img) }}" class="card-img-top" alt="{{ $product->product_name }}">
+                    <img src="{{ asset('storage/images/product/' . ($product->img ?? 'no-image.jpg')) }}" class="card-img-top" alt="{{ $product->product_name }}">
                 </a>
                 <div class="card-body">
                     <a href="{{ route('product.show', $product->id) }}" class="text-decoration-none">
@@ -76,13 +76,3 @@
     </div>
 </div>
 @endsection
-@push('scripts')
-    @if(session('error'))
-        <script>
-            Swal.fire({
-                icon: 'error',
-                text: '{{ session('error') }}',
-            });
-        </script>
-    @endif
-@endpush

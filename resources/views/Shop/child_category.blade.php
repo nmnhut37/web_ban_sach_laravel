@@ -14,7 +14,7 @@
                 <div class="col-6 col-sm-4 col-md-3 custom-5-column mb-4">
                     <div class="card h-100" style="max-width: 180px;">
                         <a href="{{ route('product.show', $product->id) }}">
-                            <img src="{{ asset('storage/images/product/' . $product->img) }}" class="card-img-top" alt="{{ $product->product_name }}">
+                            <img src="{{ asset('storage/images/product/' . ($product->img ?? 'no-image.jpg')) }}" class="card-img-top" alt="{{ $product->product_name }}">
                         </a>
                         <div class="card-body">
                             <a href="{{ route('product.show', $product->id) }}" class="text-decoration-none">

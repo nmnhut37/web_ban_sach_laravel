@@ -61,7 +61,7 @@
                             <td>{{ number_format($product->price, 0, ',', '.') }} VND</td>
                             <td>{{ $product->stock_quantity }}</td>
                             <td>
-                                <img src="{{ asset('storage/images/product/' . $product->img) }}" alt="{{ $product->product_name }}" width="100">
+                                <img src="{{ asset('storage/images/product/' . ($product->img ?? 'no-image.jpg')) }}" alt="{{ $product->product_name }}" width="100">
                             </td>
                             <td>
                                 <a href="{{ route('product.edit', $product->id) }}" class="btn btn-info btn-circle"><i class="bi bi-pencil-fill"></i></a>

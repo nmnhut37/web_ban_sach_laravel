@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('product_name');
             $table->string('description');
             $table->unsignedInteger('price');
-            $table->string('img');
+            $table->string('img')->nullable();
             $table->unsignedInteger('stock_quantity')->default(0);
             $table->unsignedInteger('purchase_count')->default(0);
             $table->string('author')->nullable();

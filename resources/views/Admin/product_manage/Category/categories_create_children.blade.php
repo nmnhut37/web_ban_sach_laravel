@@ -34,7 +34,7 @@
             <!-- Chọn danh mục cha -->
             <div class="mb-3">
                 <label for="parent_id" class="form-label">Danh mục cha</label>
-                <select name="parent_id" id="parent_id" class="form-control" required>
+                <select name="parent_id" id="parent_id" class="form-control" required disabled>
                     <option value="{{ $parentCategory->id }}">{{ $parentCategory->name }}</option>
                 </select>
             </div>
