@@ -1,73 +1,102 @@
 <?php
-
 namespace App\Http\Controllers;
+
 use App\Models\Order;
 use Illuminate\Http\Request;
 
 class DashboardController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         try {
-            $currentYear = now()->year;  // Lấy năm hiện tại
+            // Lấy năm được chọn từ request, mặc định là năm hiện tại
+            $selectedYear = $request->query('year', now()->year);
 
-            // Thu nhập của tháng hiện tại
-            $currentMonthSales = Order::whereMonth('created_at', now()->month)
-                ->where('order_status', 'completed')  // Đảm bảo chỉ tính các đơn hàng đã hoàn thành
+            // Lấy danh sách các năm có trong dữ liệu
+            $availableYears = Order::selectRaw('YEAR(created_at) as year')
+                ->groupBy('year')
+                ->orderByDesc('year')
+                ->pluck('year');
+
+            // Tính toán thu nhập tháng hiện tại
+            $currentMonthSales = Order::whereYear('created_at', now()->year)
+                ->whereMonth('created_at', now()->month)
+                ->where('order_status', 'completed')
                 ->sum('total_amount');
 
-            // Tổng thu nhập từ các đơn hàng đã hoàn thành
-            $totalSales = Order::where('order_status', 'completed')
-                ->sum('total_amount');
+            // Tính tổng thu nhập dựa trên năm được chọn
+            $totalSalesQuery = Order::where('order_status', 'completed');
+            if ($selectedYear !== 'all') {
+                $totalSalesQuery->whereYear('created_at', $selectedYear);
+            }
+            $totalSales = $totalSalesQuery->sum('total_amount');
 
-            // Đơn hàng đang xử lý
+            // Đếm số đơn hàng theo trạng thái
             $processingOrders = Order::where('order_status', 'pending')->count();
-
-            // Đơn hàng đang vận chuyển
             $shippingOrders = Order::where('order_status', 'processing')->count();
 
-            // Thu nhập theo tháng cho năm hiện tại
-            $monthlyIncome = Order::selectRaw('SUM(total_amount) as income, MONTH(created_at) as month')
-                ->whereYear('created_at', $currentYear)
-                ->where('order_status', 'completed')  // Chỉ lấy các đơn hàng đã hoàn thành
-                ->groupBy('month')
-                ->orderBy('month')
-                ->get();
+            // Lấy dữ liệu cho biểu đồ
+            $chartData = $this->layDuLieuBieuDo($selectedYear);
 
-            // Số lượng đơn hàng theo tháng cho năm hiện tại
-            $monthlyOrders = Order::selectRaw('COUNT(id) as order_count, MONTH(created_at) as month')
-                ->whereYear('created_at', $currentYear)
-                ->where('order_status', 'completed')  // Chỉ lấy các đơn hàng đã hoàn thành
-                ->groupBy('month')
-                ->orderBy('month')
-                ->get();
+            // Xử lý yêu cầu AJAX
+            if ($request->ajax()) {
+                return response()->json([
+                    'chartData' => $chartData,
+                    'totalSales' => $totalSales,
+                    'totalOrders' => $processingOrders + $shippingOrders
+                ]);
+            }
 
-            // Tạo mảng tháng từ 1 đến 12 để đảm bảo tất cả các tháng đều có dữ liệu
-            $months = collect(range(1, 12)); // Mảng các tháng (1 đến 12)
-
-            // Chuyển đổi dữ liệu thu nhập tháng thành mảng với giá trị 0 nếu không có dữ liệu cho tháng đó
-            $incomeData = $months->map(function ($month) use ($monthlyIncome) {
-                $income = $monthlyIncome->firstWhere('month', $month);
-                return [
-                    'month' => $month,
-                    'income' => $income ? $income->income : 0,
-                ];
-            });
-
-            // Chuyển đổi dữ liệu đơn hàng tháng thành mảng với giá trị 0 nếu không có dữ liệu cho tháng đó
-            $orderData = $months->map(function ($month) use ($monthlyOrders) {
-                $order = $monthlyOrders->firstWhere('month', $month);
-                return [
-                    'month' => $month,
-                    'order_count' => $order ? $order->order_count : 0,
-                ];
-            });
-
+            // Trả về view với đầy đủ dữ liệu
             return view('Admin.dashboard', compact(
-                'currentMonthSales', 'totalSales', 'processingOrders', 'shippingOrders', 'incomeData', 'orderData'
+                'currentMonthSales', 'totalSales', 'processingOrders', 
+                'shippingOrders', 'chartData', 'selectedYear', 'availableYears'
             ));
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Có lỗi xảy ra khi lấy dữ liệu.');
+            // Xử lý lỗi
+            if ($request->ajax()) {
+                return response()->json(['error' => 'Có lỗi xảy ra khi lấy dữ liệu. Vui lòng thử lại sau.'], 500);
+            }
+            return redirect()->back()->with('error', 'Có lỗi xảy ra khi lấy dữ liệu. Vui lòng thử lại sau.');
         }
+    }
+
+    private function layDuLieuBieuDo($selectedYear)
+    {
+        // Tạo mảng 12 tháng
+        $months = collect(range(1, 12));
+
+        // Truy vấn dữ liệu thu nhập theo tháng
+        $incomeQuery = Order::selectRaw('SUM(total_amount) as income, MONTH(created_at) as month')
+            ->where('order_status', 'completed')
+            ->groupBy('month')
+            ->orderBy('month');
+
+        // Truy vấn dữ liệu số lượng đơn hàng theo tháng
+        $orderQuery = Order::selectRaw('COUNT(id) as order_count, MONTH(created_at) as month')
+            ->where('order_status', 'completed')
+            ->groupBy('month')
+            ->orderBy('month');
+
+        // Lọc theo năm nếu không phải "tất cả"
+        if ($selectedYear !== 'all') {
+            $incomeQuery->whereYear('created_at', $selectedYear);
+            $orderQuery->whereYear('created_at', $selectedYear);
+        }
+
+        $monthlyIncome = $incomeQuery->get();
+        $monthlyOrders = $orderQuery->get();
+
+        // Định dạng dữ liệu cho biểu đồ
+        return [
+            'income' => $months->map(fn($month) => [
+                'month' => $month,
+                'income' => optional($monthlyIncome->firstWhere('month', $month))->income ?? 0,
+            ]),
+            'orders' => $months->map(fn($month) => [
+                'month' => $month,
+                'order_count' => optional($monthlyOrders->firstWhere('month', $month))->order_count ?? 0,
+            ])
+        ];
     }
 }

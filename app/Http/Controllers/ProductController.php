@@ -165,12 +165,11 @@ class ProductController extends Controller
         return view('shop.search', compact('products', 'banners'));
     }
     // Phương thức để lấy gợi ý sản phẩm
-    // Phương thức để lấy gợi ý sản phẩm
     public function searchSuggestions(Request $request)
     {
         try {
             $query = $request->get('query');
-            
+
             $products = Product::where('product_name', 'like', "%{$query}%")
                 ->select('id', 'product_name', 'img', 'price')
                 ->take(5)
@@ -179,7 +178,7 @@ class ProductController extends Controller
                     return [
                         'id' => $product->id,
                         'product_name' => $product->product_name,
-                        'img' => $product->img,
+                        'img' => $product->img ? asset("storage/images/product/{$product->img}") : asset("storage/images/product/no-image.jpeg"),
                         'price' => $product->price,
                         'price_formatted' => number_format($product->price, 0, ',', '.') . ' đ'
                     ];
@@ -188,11 +187,11 @@ class ProductController extends Controller
             return response()->json($products, 200, [
                 'Content-Type' => 'application/json',
             ]);
-            
+
         } catch (\Exception $e) {
             Log::error('Search suggestion error: ' . $e->getMessage());
             return response()->json([], 200);
         }
     }
-    
+
 }

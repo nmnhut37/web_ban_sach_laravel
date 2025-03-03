@@ -14,91 +14,53 @@
         });
     });
     $(document).ready(function () {
-        $('#search-input').typeahead({
-            source: function (query, process) {
+        $('#search-input').autocomplete({
+            source: function (request, response) {
                 $('#search-input').addClass('loading');
-                return $.get(searchSuggestionsUrl, { query: query })
-                    .done(function (data) {
-                        // Đảm bảo data là array
-                        if (Array.isArray(data)) {
-                            // Map data để thêm label cho typeahead
-                            const items = data.map(item => {
-                                return {
-                                    id: item.id,
-                                    label: item.product_name, // Typeahead sẽ dùng label để hiển thị
-                                    product_name: item.product_name,
-                                    img: item.img,
-                                    price_formatted: item.price_formatted
-                                };
-                            });
-                            process(items);
-                        }
-                    })
-                    .always(function () {
+                $.ajax({
+                    url: searchSuggestionsUrl,
+                    data: { query: request.term },
+                    dataType: 'json',
+                    success: function (data) {
+                        response($.map(data, function (item) {
+                            return {
+                                label: item.product_name,
+                                value: item.product_name,
+                                id: item.id,
+                                img: item.img,
+                                price_formatted: item.price_formatted
+                            };
+                        }));
+                    },
+                    complete: function () {
                         $('#search-input').removeClass('loading');
-                    });
+                    }
+                });
             },
             minLength: 2,
-            items: 5,
-            autoSelect: false,
-            displayText: function (item) {
-                return item.product_name;
-            },
-            highlighter: function (item) {
-                if (typeof item === 'string') {
-                    return item;
-                }
-    
-                const defaultImage = '/storage/images/product/no-image.jpeg';
-                const imageUrl = item.img 
-                    ? `/storage/images/product/${item.img}` 
-                    : defaultImage;
-    
-                // CSS cho item suggestion
-                const style = `
-                    <style>
-                        .typeahead-item {
-                            display: flex;
-                            align-items: center;
-                            padding: 5px;
-                        }
-                        .product-img {
-                            margin-right: 10px;
-                        }
-                        .product-info {
-                            flex-grow: 1;
-                        }
-                        .product-name {
-                            font-weight: bold;
-                        }
-                        .product-price {
-                            color: #dc3545;
-                        }
-                    </style>
-                `;
-    
-                return `
-                    ${style}
-                    <div class="typeahead-item">
-                        <div class="product-img">
-                            <img src="${imageUrl}" 
-                                 alt="${item.product_name || ''}" 
-                                 style="width: 50px; height: 50px; object-fit: cover; border-radius: 5px;"
-                                 onerror="this.onerror=null; this.src='${defaultImage}'">
-                        </div>
-                        <div class="product-info">
-                            <div class="product-name">${item.product_name || 'Không có tên'}</div>
-                            <div class="product-price">${item.price_formatted || 'Liên hệ'}</div>
+            select: function (event, ui) {
+                window.location.href = `/product/${ui.item.id}`;
+            }
+        }).autocomplete("instance")._renderItem = function (ul, item) {
+            return $("<li>")
+                .append(`
+                    <div class="d-flex align-items-center p-2" style="border-bottom: 1px #ddd; width: 100%;">
+                        <div class="row w-100">
+                            <div class="col-2 d-flex align-items-center">
+                                <img src="${item.img}" alt="${item.label}" class="rounded"
+                                    style="width: 70px; height: 70px; object-fit: cover;">
+                            </div>
+                            <div class="col-10">
+                                <div class="fw-bold text-dark">${item.label}</div>
+                                <div class="text-danger fw-bold">${item.price_formatted}</div>
+                            </div>
                         </div>
                     </div>
-                `;
-            },
-            afterSelect: function (item) {
-                window.location.href = `/product/${item.id}`;
-            },
-            matcher: function (item) {
-                return true;
-            }
-        });
+                `)
+                .appendTo(ul);
+        };
     });
+    
+    
+
     

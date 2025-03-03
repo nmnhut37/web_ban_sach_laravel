@@ -29,6 +29,26 @@ footer {
 .dropdown-submenu:hover > .dropdown-menu {
     display: block; /* Hiển thị khi hover */
 }
+.ui-menu-item-wrapper:hover {
+    display: flex;
+    align-items: center;
+    border: #fff;
+}
+.ui-menu-item-wrapper .row:hover {
+    display: flex;
+    align-items: center;
+    border: #fff;
+}
+.ui-menu-item:hover {
+    display: flex;
+    align-items: center;
+    border: 0;
+}
+.ui-menu-item::before:hover {
+    display: flex;
+    align-items: center;
+    border: #fff;
+}
 
 /* Định dạng mũi tên cho submenu */
 .dropdown-submenu > a:after {
@@ -156,5 +176,34 @@ footer {
     list-style: none; /* Loại bỏ marker */
     padding: 0;
     margin: 0;
+}
+/* Chỉnh kích thước ô tìm kiếm */
+#search-input {
+    height: 45px;
+    font-size: 16px;
+    padding-left: 15px;
+}
+
+.input-group .btn {
+    height: 45px;
+}
+
+/* Chỉnh danh sách gợi ý */
+.ui-autocomplete {
+    max-width: 700px; /* Giới hạn độ rộng */
+    border-radius: 8px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    padding: 5px;
+    background: #fff;
+    z-index: 1050;
+}
+
+.ui-menu-item {
+    padding: 8px 12px;
+    cursor: pointer;
+}
+
+.ui-menu-item:hover {
+    background-color: #f8f9fa;
 }
 

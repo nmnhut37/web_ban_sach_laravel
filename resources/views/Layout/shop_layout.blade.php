@@ -11,6 +11,7 @@
     <link href="https://cdn.jsdelivr.net/npm/datatables.net-bs4@1.13.1/css/dataTables.bootstrap4.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.5.1/dist/sweetalert2.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.2/themes/smoothness/jquery-ui.min.css">
     <link href="{{ asset('css/style.css') }}" rel="stylesheet">
     @stack('styles')
 </head>
@@ -34,7 +35,7 @@
                                 <!-- Search Bar -->
                                 <form action="{{ route('search.shop') }}" method="POST" class="d-flex w-100 w-lg-40 justify-content-center">
                                     @csrf
-                                    <div class="input-group" style="max-width: 500px;">
+                                    <div class="input-group" style="max-width: 700px;">
                                         <input type="text" name="tensp" id="search-input" class="form-control" placeholder="Tìm kiếm" aria-label="Search" autocomplete="off">
                                         <button class="btn btn-primary" type="submit">
                                             <i class="bi bi-search"> Tìm kiếm</i>
@@ -168,6 +169,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-3-typeahead/4.0.1/bootstrap3-typeahead.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.2/jquery-ui.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="{{ asset('js/cart.js') }}"></script>
     <script src="{{ asset('js/main.js') }}"></script>

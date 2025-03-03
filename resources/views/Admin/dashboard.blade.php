@@ -1,10 +1,10 @@
 @extends('Layout.master')
 
 @section('content')
-
 <div class="d-sm-flex align-items-center justify-content-between mb-4">
     <h1 class="h3 mb-0 text-gray-800">Bảng điều khiển</h1>
 </div>
+
 <div class="row">
     <!-- Thu nhập tháng hiện tại -->
     <div class="col-xl-3 col-md-6 mb-4">
@@ -88,12 +88,22 @@
 </div>
 
 <div class="row">
-    <!-- Monthly Revenue Chart -->
+    <!-- Biểu đồ doanh thu -->
     <div class="col-xl-6 mb-4">
         <div class="card card-header-actions h-100">
-            <div class="card-header d-flex justify-content-between">
-                <span>Thu nhập của năm {{ now()->year }}</span>
-                <span>Tổng thu nhập: {{ number_format($totalSales, 0) }} đ</span>
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center">
+                        <span class="me-2">Thu nhập của </span>
+                        <select name="year" id="year" class="form-control form-control-sm d-inline-block" style="width: auto; min-width: 100px;">
+                            <option value="all" {{ $selectedYear == 'all' ? 'selected' : '' }}>tất cả các năm</option>
+                            @foreach($availableYears as $year)
+                                <option value="{{ $year }}" {{ $selectedYear == $year ? 'selected' : '' }}>năm {{ $year }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <span>Tổng thu nhập: <span id="totalSalesText">{{ number_format($totalSales, 0) }}</span> đ</span>
+                </div>
             </div>
             <div class="card-body">
                 <canvas id="myAreaChart"></canvas>
@@ -101,12 +111,22 @@
         </div>
     </div>
 
-    <!-- Orders Count Chart -->
+    <!-- Biểu đồ đơn hàng -->
     <div class="col-xl-6 mb-4">
         <div class="card card-header-actions h-100">
-            <div class="card-header d-flex justify-content-between">
-                <span>Đơn hàng của năm {{ now()->year }}</span>
-                <span>Tổng đơn hàng: {{ $processingOrders + $shippingOrders }}</span>
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center">
+                        <span class="me-2">Đơn hàng của </span>
+                        <select name="year2" id="year2" class="form-control form-control-sm d-inline-block" style="width: auto; min-width: 100px;">
+                            <option value="all" {{ $selectedYear == 'all' ? 'selected' : '' }}>tất cả các năm</option>
+                            @foreach($availableYears as $year)
+                                <option value="{{ $year }}" {{ $selectedYear == $year ? 'selected' : '' }}>năm {{ $year }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <span>Tổng đơn hàng: <span id="totalOrdersText">{{ $processingOrders + $shippingOrders }}</span></span>
+                </div>
             </div>
             <div class="card-body">
                 <canvas id="myBarChart"></canvas>
@@ -114,20 +134,30 @@
         </div>
     </div>
 </div>
-
 @endsection
 
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    var ctx = document.getElementById('myAreaChart').getContext('2d');
-    var myAreaChart = new Chart(ctx, {
+let bieuDoDoanhThu, bieuDoDonHang;
+
+// Hàm khởi tạo và cập nhật biểu đồ
+function capNhatBieuDo(duLieu) {
+    const ctx1 = document.getElementById('myAreaChart').getContext('2d');
+    const ctx2 = document.getElementById('myBarChart').getContext('2d');
+    
+    // Xóa biểu đồ cũ nếu đã tồn tại
+    if (bieuDoDoanhThu) bieuDoDoanhThu.destroy();
+    if (bieuDoDonHang) bieuDoDonHang.destroy();
+
+    // Khởi tạo biểu đồ doanh thu
+    bieuDoDoanhThu = new Chart(ctx1, {
         type: 'line',
         data: {
-            labels: @json($incomeData->pluck('month')),
+            labels: duLieu.income.map(item => `Tháng ${item.month}`),
             datasets: [{
-                label: 'Thu nhập theo tháng',
-                data: @json($incomeData->pluck('income')),
+                label: 'Doanh thu theo tháng',
+                data: duLieu.income.map(item => item.income),
                 backgroundColor: 'rgba(54, 162, 235, 0.2)',
                 borderColor: 'rgba(54, 162, 235, 1)',
                 borderWidth: 2,
@@ -137,24 +167,36 @@
         options: {
             responsive: true,
             scales: {
-                x: {
-                    title: { display: true, text: 'Tháng' }
-                },
-                y: {
-                    title: { display: true, text: 'Thu nhập (VND)' }
+                x: { title: { display: true, text: 'Tháng' } },
+                y: { 
+                    title: { display: true, text: 'Doanh thu (VNĐ)' },
+                    ticks: {
+                        callback: function(value) {
+                            return new Intl.NumberFormat('vi-VN').format(value) + ' đ';
+                        }
+                    }
+                }
+            },
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return new Intl.NumberFormat('vi-VN').format(context.raw) + ' đ';
+                        }
+                    }
                 }
             }
         }
     });
 
-    var ctx2 = document.getElementById('myBarChart').getContext('2d');
-    var myBarChart = new Chart(ctx2, {
+    // Khởi tạo biểu đồ đơn hàng
+    bieuDoDonHang = new Chart(ctx2, {
         type: 'bar',
         data: {
-            labels: @json($orderData->pluck('month')),
+            labels: duLieu.orders.map(item => `Tháng ${item.month}`),
             datasets: [{
                 label: 'Số lượng đơn hàng',
-                data: @json($orderData->pluck('order_count')),
+                data: duLieu.orders.map(item => item.order_count),
                 backgroundColor: 'rgba(255, 99, 132, 0.2)',
                 borderColor: 'rgba(255, 99, 132, 1)',
                 borderWidth: 2
@@ -163,14 +205,62 @@
         options: {
             responsive: true,
             scales: {
-                x: {
-                    title: { display: true, text: 'Tháng' }
-                },
-                y: {
-                    title: { display: true, text: 'Số lượng đơn hàng' }
+                x: { title: { display: true, text: 'Tháng' } },
+                y: { 
+                    title: { display: true, text: 'Số đơn hàng' },
+                    beginAtZero: true
                 }
             }
         }
     });
+}
+
+// Khởi tạo biểu đồ với dữ liệu ban đầu
+capNhatBieuDo({
+    income: @json($chartData['income']),
+    orders: @json($chartData['orders'])
+});
+
+// Xử lý sự kiện khi thay đổi năm trên dropdown thu nhập
+document.getElementById('year').addEventListener('change', function() {
+    const namDuocChon = this.value;
+    // Đồng bộ với dropdown đơn hàng
+    document.getElementById('year2').value = namDuocChon;
+    // Hiển thị trạng thái đang tải
+    document.querySelectorAll('.card-body').forEach(el => {
+        el.style.opacity = '0.5';
+    });
+
+    // Gọi API lấy dữ liệu mới
+    fetch(`{{ route('dashboard') }}?year=${namDuocChon}`, {
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Cập nhật biểu đồ
+        capNhatBieuDo(data.chartData);
+        
+        // Cập nhật tổng số liệu
+        document.getElementById('totalSalesText').textContent = new Intl.NumberFormat('vi-VN').format(data.totalSales);
+        document.getElementById('totalOrdersText').textContent = data.totalOrders;
+        
+        // Bỏ trạng thái đang tải
+        document.querySelectorAll('.card-body').forEach(el => {
+            el.style.opacity = '1';
+        });
+    })
+    .catch(error => {
+        console.error('Lỗi:', error);
+        alert('Có lỗi xảy ra khi lấy dữ liệu. Vui lòng thử lại.');
+    });
+});
+
+// Đồng bộ hóa khi thay đổi dropdown đơn hàng
+document.getElementById('year2').addEventListener('change', function() {
+    document.getElementById('year').value = this.value;
+    document.getElementById('year').dispatchEvent(new Event('change'));
+});
 </script>
 @endpush

@@ -28,8 +28,8 @@ class OrderFactory extends Factory
             'final_amount' => $this->faker->numberBetween(100000, 1000000),
             'payment_method' => $this->faker->randomElement(['COD', 'MoMo', 'VNPay']),
             'order_status' => $this->faker->randomElement(['pending', 'processing', 'completed', 'cancelled']),
-            'created_at' => $this->faker->dateTimeBetween('2024-01-01', '2024-12-31'),
-            'updated_at' => $this->faker->dateTimeBetween('2024-01-01', '2024-12-31'),
+            'created_at' => $this->faker->dateTimeBetween('2025-01-01', '2025-12-31'),
+            'updated_at' => $this->faker->dateTimeBetween('2025-01-01', '2025-12-31'),
         ];
     }
 }
