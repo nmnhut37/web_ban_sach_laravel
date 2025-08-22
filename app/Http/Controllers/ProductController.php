@@ -15,13 +15,13 @@ class ProductController extends Controller
     public function index()
     {
         $products = Product::with('category')->get();
-        return view('Admin.product_manage.Product.product_list', compact('products'));
+        return view('admin.product_manage.product.product_list', compact('products'));
     }
     // Hiển thị form thêm sản phẩm
     public function create()
     {
         $categories = Category::whereNotNull('parent_id')->get();
-        return view('Admin.product_manage.product.product_create', compact('categories'));
+        return view('admin.product_manage.product.product_create', compact('categories'));
     }
     // Lưu sản phẩm mới
     public function store(Request $request)
@@ -63,7 +63,7 @@ class ProductController extends Controller
     {
         $product = Product::findOrFail($id);
         $categories = Category::whereNotNull('parent_id')->get();
-        return view('Admin.product_manage.product.product_edit', compact('product', 'categories'));
+        return view('admin.product_manage.product.product_edit', compact('product', 'categories'));
     }
     // Cập nhật thông tin sản phẩm
     public function update(Request $request, $id)

@@ -7,7 +7,7 @@
                     </button>
                     <!-- Logo -->
                     <a class="navbar-brand d-flex align-items-center" href="{{route('dashboard')}}">
-                        <img src="{{asset('/storage/images/Logo/Logo.png')}}" alt="Logo" style="height: 60px;" class="mr-2">
+                        <img src="{{asset('/storage/images/logo/Logo.png')}}" alt="Logo" style="height: 60px;" class="mr-2">
                     </a>
                     <!-- Topbar Navbar -->
                     <ul class="navbar-nav ml-auto">

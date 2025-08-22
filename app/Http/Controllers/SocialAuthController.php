@@ -35,9 +35,9 @@ class SocialAuthController extends Controller
             }
 
             // Đăng nhập người dùng
-            Auth::login($user, true);
+            Auth::login($user);
 
-            return redirect()->to('/home'); // Chuyển hướng đến trang sau khi đăng nhập thành công
+            return redirect()->route('index'); // Chuyển hướng đến trang sau khi đăng nhập thành công
         } catch (\Exception $e) {
             return redirect()->route('login')->with('error', 'Có lỗi xảy ra khi đăng nhập với Google');
         }

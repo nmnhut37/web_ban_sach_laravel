@@ -16,18 +16,15 @@ use App\Http\Controllers\OrderManageController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ReviewController;
 
-Route::get('/test', function () {return view('test.test');});
+//Route::get('/test', function () {return view('test.test');});
 
 //Home
 Route::get('/', [HomeController::class, 'index'])->name('index');
 Route::get('/product/{id}', [HomeController::class, 'show'])->name('product.show');
 Route::get('/categories/{id}', [CategoryController::class, 'showCategory'])->name('category.show');
 Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store')->middleware('auth');
-
 Route::post('/search', [ProductController::class, 'searchshop'])->name('search.shop');
 Route::get('/search/products', [ProductController::class, 'searchSuggestions'])->name('product.search.suggestions');
-
-
 
 
 // Auth
@@ -42,8 +39,8 @@ Route::post('forgot-password', [AuthController::class, 'forgotPassword'])->name(
 Route::get('password/reset/{token}', [AuthController::class, 'showResetForm'])->name('password.reset');
 Route::post('password/reset', [AuthController::class, 'resetPassword'])->name('password.update');
 
-Route::get('login/google', [SocialAuthController::class, 'redirectToGoogle'])->name('google.login');
-Route::get('login/google/callback', [SocialAuthController::class, 'handleGoogleCallback']);
+Route::get('auth/google', [SocialAuthController::class, 'redirectToGoogle'])->name('google.login');
+Route::get('auth/google/callback', [SocialAuthController::class, 'handleGoogleCallback']);
 
 // Profile
 Route::get('/profile', [ProfileController::class, 'showProfile'])->name('profile.showProfile');
@@ -76,9 +73,6 @@ Route::prefix('order')->name('order.')->group(function () {
 Route::get('/payment/callback/{method}', [OrderController::class, 'handlePaymentCallback'])->name('payment.callback');
 
 
-
-
-// Middleware auth và admin vẫn được giữ nguyên
 Route::middleware(['auth', 'admin'])->group(function () {
 
     // Dashboard

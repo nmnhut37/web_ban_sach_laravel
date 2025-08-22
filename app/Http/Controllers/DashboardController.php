@@ -48,7 +48,7 @@ class DashboardController extends Controller
             }
 
             // Trả về view với đầy đủ dữ liệu
-            return view('Admin.dashboard', compact(
+            return view('admin.dashboard', compact(
                 'currentMonthSales', 'totalSales', 'processingOrders', 
                 'shippingOrders', 'chartData', 'selectedYear', 'availableYears'
             ));

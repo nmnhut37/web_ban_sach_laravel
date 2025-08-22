@@ -18,13 +18,23 @@
             <p>
                 <strong>Trạng thái đơn hàng:</strong>
                 <span class="badge 
-                    @if($order->order_status == 'pending') text-bg-secondary
-                    @elseif($order->order_status == 'processing') text-bg-primary
-                    @elseif($order->order_status == 'completed') text-bg-success
-                    @elseif($order->order_status == 'cancelled') text-bg-danger
-                    @endif">
+                @if($order->order_status == 'pending') text-bg-secondary
+                @elseif($order->order_status == 'processing') text-bg-primary
+                @elseif($order->order_status == 'completed') text-bg-success
+                @elseif($order->order_status == 'cancelled') text-bg-danger
+                @endif">
+                @if($order->order_status == 'pending')
+                    Đang xử lý
+                @elseif($order->order_status == 'processing')
+                    Đang vận chuyển
+                @elseif($order->order_status == 'completed')
+                    Hoàn thành
+                @elseif($order->order_status == 'cancelled')
+                    Đã hủy
+                @else
                     {{ ucfirst($order->order_status) }}
-                </span>
+                @endif
+            </span>
             </p>
         </div>
     </div>

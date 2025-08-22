@@ -1,4 +1,4 @@
-    @extends('Layout.shop_layout')
+    @extends('layout.shop_layout')
     @push('styles')
     <style>
         .img-fluid {

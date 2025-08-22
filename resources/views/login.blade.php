@@ -1,4 +1,4 @@
-@extends('Layout.login_layout')
+@extends('layout.login_layout')
 
 @section('content')
 <!-- Outer Row -->
@@ -9,7 +9,7 @@
                 <div class="row">
                     <div class="col-lg-6 d-none d-lg-block bg-login-image">
                         <a href="{{ route('index') }}">
-                            <img src="{{ asset('/storage/images/Logo/Logo.png') }}" alt="Logo" class="img-fluid" style="max-width: 80%; margin: 50px auto; display: block;">
+                            <img src="{{ asset('/storage/images/logo/Logo.png') }}" alt="Logo" class="img-fluid" style="max-width: 80%; margin: 50px auto; display: block;">
                         </a>
                     </div>
                     <div class="col-lg-6">

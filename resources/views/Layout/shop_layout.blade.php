@@ -30,7 +30,7 @@
                             <div class="w-100 d-flex flex-column flex-lg-row justify-content-center align-items-center gap-3">
                                 <!-- Logo -->
                                 <a href="{{route('index')}}" class="navbar-brand">
-                                    <img src="{{ asset('storage/images/Logo/Logo.png') }}" alt="Logo" style="width: 100px;">
+                                    <img src="{{ asset('storage/images/logo/Logo.png') }}" alt="Logo" style="width: 100px;">
                                 </a>
                                 <!-- Search Bar -->
                                 <form action="{{ route('search.shop') }}" method="POST" class="d-flex w-100 w-lg-40 justify-content-center">

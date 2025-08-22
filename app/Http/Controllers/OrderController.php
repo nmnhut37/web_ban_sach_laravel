@@ -27,7 +27,6 @@ class OrderController extends Controller
         }
 
         try {
-            // Validate request
             $request->validate([
                 'full_name' => 'required',
                 'email' => 'required|email',
@@ -36,7 +35,6 @@ class OrderController extends Controller
                 'payment_method' => 'required|in:momo,vnpay,cod'
             ]);
 
-            // If validation passes, proceed with payment processing
             return $paymentService->processPayment(
                 $request->payment_method,
                 $request,
@@ -57,7 +55,7 @@ class OrderController extends Controller
         } catch (\Exception $e) {
             Log::error('Payment Callback Error: ' . $e->getMessage());
             return redirect()
-                ->route('checkout')
+                ->route('checkout.index')
                 ->with('error', 'Có lỗi xảy ra trong quá trình xử lý callback.');
         }
     }

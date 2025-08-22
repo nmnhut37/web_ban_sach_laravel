@@ -8,26 +8,24 @@ use Illuminate\Support\Facades\Log;
 
 class BannerController extends Controller
 {
-    /**
-     * Hiển thị danh sách banner.
-     */
+    
+    // Hiển thị danh sách banner.
+
     public function index()
     {
         $banners = Banner::get();
-        return view('Admin.banner_manage.banner', compact('banners'));
+        return view('admin.banner_manage.banner', compact('banners'));
     }
 
-    /**
-     * Hiển thị form tạo mới banner.
-     */
+    // Hiển thị form tạo mới banner.
+
     public function create()
     {
-        return view('Admin.banner_manage.banner_create');
+        return view('admin.banner_manage.banner_create');
     }
 
-    /**
-     * Lưu banner mới vào cơ sở dữ liệu.
-     */
+
+    // Lưu banner mới vào cơ sở dữ liệu.
     public function store(Request $request)
     {
         $request->validate([
@@ -50,7 +48,7 @@ class BannerController extends Controller
                 $imageFile = $request->file('image');
                 if ($imageFile->isValid()) {
                     $imageName = time() . '-' . $imageFile->getClientOriginalName();
-                    $imageFile->move(public_path('storage/images/Banner'), $imageName);
+                    $imageFile->move(public_path('storage/images/banner'), $imageName);
                 }
             }
 
@@ -68,26 +66,23 @@ class BannerController extends Controller
 
             return redirect()->route('banners.index')->with('success', 'Thêm banner thành công!');
         } catch (\Exception $e) {
-            // Log lỗi để kiểm tra (nếu cần)
+
             Log::error('Lỗi thêm banner: ' . $e->getMessage());
 
-            // Trả về thông báo lỗi cho người dùng
             return redirect()->back()->with('error', 'Đã xảy ra lỗi khi thêm banner. Vui lòng thử lại sau.');
         }
     }
 
+    // Hiển thị form chỉnh sửa banner.
 
-    /**
-     * Hiển thị form chỉnh sửa banner.
-     */
     public function edit(Banner $banner)
     {
-        return view('Admin.banner_manage.banner_edit', compact('banner'));
+        return view('admin.banner_manage.banner_edit', compact('banner'));
     }
 
-    /**
-     * Cập nhật banner trong cơ sở dữ liệu.
-     */
+
+    // Cập nhật banner trong cơ sở dữ liệu.
+
     public function update(Request $request, Banner $banner)
     {
         $request->validate([
@@ -108,14 +103,14 @@ class BannerController extends Controller
 
         if ($request->hasFile('image')) {
             // Xóa ảnh cũ nếu tồn tại
-            if ($banner->image && file_exists(public_path('storage/images/Banner/' . $banner->image))) {
-                unlink(public_path('storage/images/Banner/' . $banner->image));
+            if ($banner->image && file_exists(public_path('storage/images/banner/' . $banner->image))) {
+                unlink(public_path('storage/images/banner/' . $banner->image));
             }
 
-            // Lưu ảnh mới vào thư mục storage/images/Banner
+            // Lưu ảnh mới vào thư mục storage/images/banner
             $imageFile = $request->file('image');
             $imageName = time() . '-' . $imageFile->getClientOriginalName();
-            $imageFile->move(public_path('storage/images/Banner'), $imageName);
+            $imageFile->move(public_path('storage/images/banner'), $imageName);
             $banner->image = $imageName;
         }
 
@@ -127,14 +122,14 @@ class BannerController extends Controller
         return redirect()->route('banners.index')->with('success', 'Cập nhật banner thành công!');
     }
 
-    /**
-     * Xóa banner khỏi cơ sở dữ liệu.
-     */
+
+    // Xóa banner khỏi cơ sở dữ liệu.
+
     public function destroy(Banner $banner)
     {
-        // Xóa ảnh khỏi thư mục storage/images/Banner
-        if ($banner->image && file_exists(public_path('storage/images/Banner/' . $banner->image))) {
-            unlink(public_path('storage/images/Banner/' . $banner->image));
+        // Xóa ảnh khỏi thư mục storage/images/banner
+        if ($banner->image && file_exists(public_path('storage/images/banner/' . $banner->image))) {
+            unlink(public_path('storage/images/banner/' . $banner->image));
         }
 
         $banner->delete();

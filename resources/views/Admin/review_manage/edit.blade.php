@@ -1,4 +1,4 @@
-@extends('Layout.master')
+@extends('layout.master')
 
 @section('content')
     <!-- Page Heading -->

@@ -1,4 +1,4 @@
-@extends('Layout.master')
+@extends('layout.master')
 
 @section('content')
 <div class="d-sm-flex align-items-center justify-content-between mb-4">

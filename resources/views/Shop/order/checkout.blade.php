@@ -23,10 +23,10 @@
             </ul>
             <div class="tab-content">
                 <div class="tab-pane show active" id="billing-information">
-                    @include('Shop.order.order')
+                    @include('shop.order.order')
                 </div>
                 <div class="tab-pane" id="payment-information">
-                    @include('Shop.order.payment')
+                    @include('shop.order.payment')
                 </div>
             </div>
         </div>

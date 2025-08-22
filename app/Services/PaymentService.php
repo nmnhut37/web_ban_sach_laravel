@@ -216,7 +216,7 @@ class PaymentService
     
                 default: // Các trường hợp lỗi khác
                     return redirect()
-                        ->route('checkout')
+                        ->route('checkout.index')
                         ->with('error', 'Thanh toán không thành công. Mã lỗi: ' . $request->vnp_ResponseCode);
             }
         }
@@ -229,10 +229,7 @@ class PaymentService
             'CalculatedHash' => $secureHash
         ]);
         return redirect()
-            ->route('checkout')
+            ->route('checkout.index')
             ->with('error', 'Dữ liệu thanh toán không hợp lệ.');
     }
-    
-    
-
 }
